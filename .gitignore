@@ -1,0 +1,34 @@
+# LaTeX intermediate and output files
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.nav
+*.snm
+*.vrb
+*.xdv
+
+# PDF and other output files
+*.dvi
+*.ps
+
+# Editor and OS files
+*.swp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# VSCode settings (optional)
+.vscode/
+
+# Latex Workshop cache
+.latexmkrc
+.latexworkshop/

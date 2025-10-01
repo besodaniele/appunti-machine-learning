@@ -1,0 +1,46 @@
+\documentclass[12pt,openany,onesided]{book}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{subfig} % Added for subfloat functionality
+\usepackage{subfiles}
+% Page layout
+\geometry{a4paper, margin=1in}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Machine Learning}
+\fancyhead[R]{\thepage}
+\setlength{\headheight}{14.49998pt} % Adjust head height
+\addtolength{\topmargin}{-2.49998pt} % Compensate for the increased head height
+\hypersetup{
+    colorlinks,
+    linkcolor=black,
+    filecolor=black,
+    urlcolor=cyan,
+}
+\newtheorem{theorem}{Theorem}
+\title{Appunti di machine learning}
+\author{Daniele Besozzi}
+\date{Anno accademico 2025/2026}
+\begin{document}
+\frontmatter
+\maketitle	
+\tableofcontents
+\newpage
+\mainmatter
+\chapter*{Premesse}
+Questi sono appunti realizzati per riassumere e schematizzare tutti i concetti presentati durante il corso di machine learning tenuto presso il corso di laurea magistrale in informatica presso l'università degli studi di Milano Bicocca.
+Lo scopo di questo documento non è quello di sostituire le lezioni del corso o di essere l'unica fonte di studio, bensì integrare le altri fonti con un documento riassuntivo.
+\\
+Mi scuso in anticipo per eventuali errori e prego i lettori di segnalarli contattandomi via mail all'indirizzo \href{mailto:d.besozzi@campus.unimib.it}{d.besozzi@campus.unimib.it}.
+\subfile{sections/introduzione.tex}
+
+\end{document}

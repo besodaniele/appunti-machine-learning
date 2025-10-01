@@ -1,0 +1,53 @@
+\documentclass{../main.tex}[subfiles]
+\begin{document}
+\chapter{Introduzione}
+In questo capitolo presenterò gli aspetti matematici fondamentali per andare ad affrontare gli argomenti del corso.
+\\
+\section{Vettori e matrici}
+Denotiamo un vettore riga e colonna rispettivamente con $(a,b,c)$ e $ \begin{bmatrix} a \\ b \\ c \end{bmatrix} $
+\\dove $a,b,c\in\mathbb{R}$ sono scalari.
+\\
+In generale denotiamo con le lettere maiuscole le matrici, e.g. $X$ e i suoi elementi con $X_{ij}$.\\
+$x\in \mathbb{R}^n$ è un vettore di n elementi e $X \in \mathbb{R}^{m \times n}$ è una matrice di dimensione $m \times n$.
+\section{Norme di vettori e matrici}
+Dato un vettore $x\in \mathbb{R}^n$ vi sono diversi tipi di norme comunemente utilizzate.
+\begin{itemize}
+	\item $||x||_2=(\sum_{i=1}^n x_i^2)^{\frac{1}{2}}$
+	è il tipo più comune e viene chiamato \textbf{norma 2} di un vettore o \textbf{norma Euclidea}. Normalmente è denotato semplicemente con $||x||$.
+	\item $||x||_1=|x_1|+|x_2|+\cdots+|x_n|$, detta la \textbf{norma 1} o \textbf{distanza di Manhattan}
+	\item $||x||_\infty=\max_{1\leq i\leq n}|x_i|$, detta la \textbf{norma $\infty$}.
+\end{itemize}
+Analogamente, per una matrice $X \in \mathbb{R}^{m \times n}$, si possono definire diverse norme:
+
+\begin{itemize}
+	\item \textbf{Norma di Frobenius}: $||X||_F = \left( \sum_{i=1}^m \sum_{j=1}^n |X_{ij}|^2 \right)^{\frac{1}{2}}$
+	\item \textbf{Norma spettrale (o norma 2)}: $||X||_2$
+	\item \textbf{Norma 1}: $||X||_1=\sum_{i,j} |X_{ij}|$
+\end{itemize}
+\section{Notazioni generiche}
+Siano:
+\begin{itemize}
+	\item $u$: variabile indipendente (input), non necessariamente un vettore o uno scalare
+	\item $v$: variabile dipendente (output), come sopra 
+\end{itemize}
+allora abbiamo che:
+\begin{itemize}
+	\item $x=\Phi(u)$, dove $x\in \mathbb{R}^d$ è il vettore di features e $\Phi$ è la funzione di mapping o embedding.
+	\item $y=\Psi(v)$, dove $y\in \mathbb{R}^m$ è il vettore target (o di output) e $\Psi$ è la funzione di mapping di feature in output.
+\end{itemize}
+Siano $x^1,\dots x^n$ e $y^1,\dots y^n$ due dataset di $n$ esempi, dove $x^i$ e $y^i$ formano la $i$-esima coppia di dati. Dunque $n$ è il numero di campioni, allora posso associarvi le due matrici dei dati
+$$X=\begin{bmatrix}
+	(x^1)^T\\ \vdots \\ (x^n)^T
+\end{bmatrix}\in \mathbb{R}^{n \times d}, \quad Y=\begin{bmatrix}
+	(y^1)^T\\ \vdots \\ (y^n)^T
+\end{bmatrix}\in \mathbb{R}^{n \times m}$$
+Le cui righe sono i vettori feature e i vettori target rispettivamente, trasposti.\\
+Definiamo allora:
+\begin{itemize}
+	\item $g_\theta: \mathbb{R}^d \to \mathbb{R}^m$ è un predittore. 
+	\item $\hat{y}=g_\theta(x)$ è la predizione di $y$, dato $x$.
+	\item $\Theta\in\mathbb{R}^p$ è il vettore di parametri del predittore.
+\end{itemize}
+La scelta dei parametri $\Theta$ a seconda dei dati viene chiamato \textit{training} o \textit{fitting} del predittore. 
+
+\end{document}
