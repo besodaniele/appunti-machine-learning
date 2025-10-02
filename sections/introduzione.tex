@@ -49,5 +49,63 @@ Definiamo allora:
 	\item $\Theta\in\mathbb{R}^p$ è il vettore di parametri del predittore.
 \end{itemize}
 La scelta dei parametri $\Theta$ a seconda dei dati viene chiamato \textit{training} o \textit{fitting} del predittore. 
+\\
+Separando le definizioni in base al dominio di riferimento, abbiamo le seguenti suddivisioni:
+\begin{itemize}
+	\item Spazio di input:
+	\begin{itemize}
+		\item Istanza (sample, oggetto, record): un esempio descritto da un certo numero di attributi.
+		\item Attributo (campo, caratteristica, variabile): misura di un aspetto di una istanza.
+	
+	\end{itemize}
+	\item Spazio di output:
+	\begin{itemize}
+		\item Classe (label, target): categoria a cui appartiene una istanza.
+	\end{itemize}
+	\item Predittore o modello:
+	\begin{itemize}
+		\item Una funzione $g$ con parametri $\Theta$ che dato uno spazio di input $X$ produce uno spazio di output $Y$.produce una predizione nello spazio di output $Y$.
+	\end{itemize}
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/esempioDefinizioni.png}
+	\caption{Esempi pratici.}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/esempioDefinizioni2.png}
+	\caption{Esempi pratici 2.}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/esempioDefinizioni3.png}
+	\caption{Esempi pratici 3.}
+\end{figure}
+\section{Rischio atteso e rischio empirico}
+Quando un modello di machine learning $g$ viene addestrato, vogliamo che abbia buone prestazioni non solo per i dati utilizzati per il training, ma anche per dati sconosciuti (\textit{generalizzazione}).
+Dovremo stimare il \textbf{rischio atteso}, ovvero la loss media che dovrebbe presentarsi sulla reale distribuzione dei dati $P(x,y)$. 
+\\
+Supponiamo di avere un dataset di $n$ coppie $(x^i,y^i)$, dove $x^i$ è il vettore di feature e $y^i$ il vettore target associato alla $i$-esima istanza.
+Definiamo la \textbf{loss function} $L(g_\Theta(x),y)$, che misura l'errore commesso dal modello $g_\Theta$.
+\\
+Dunque il rischio atteso è definito come:
+$$R(g_\Theta)=E_{(x,y)\sim P}[L(g_\Theta(x),y)]$$
+Da notare però che la reale distribuzione $P$ \underbar{non è nota}, dunque non possiamo stimare il rischio atteso. Le cause sono:
+\begin{enumerate}
+	\item Distribuzione non nota \\
+		Osserviamo solo un campione finito di campioni estratti dal mondo reale. La distribuzione completa che genera quei dati non è accessibile.
+	\item Impossibilità pratica\\
+		Anche se conoscessimo il processo di generazione in teoria, calcolare esattamente la predizione del rischio è impossibile in generale perché richiederebbe di sommare/integrare tutte i possibili esempi.
+	\item Dati finiti e rumorosi\\
+		Il dataset a disposizione è finito, spesso presenta rumore e errori di misura, o bias di raccolta. Dunque possiamo solo approssimare il rischio utilizzando una \textbf{stima empirica}.
+\end{enumerate}
+Dunque, vogliamo stimare e minimizzare il rischio empirico. Supponiamo di avere un dataset di $n$ coppie $(x^i,y^i)$.
+Definiamo la loss function $L(g_\Theta(x),y)$, che misura l'errore commesso dal modello $g_\Theta$.
+Allora il rischio empirico $\hat{R}(g_\Theta)$ è definito come:
+$$\hat{R}(g_\Theta)=\frac{1}{n}\sum_{i=1}^n L(g_\Theta(x^i),y^i)$$
+La maggior parte degli algoritmi di machine learning minimizzano il rischio empirico.
+$$g^*=arg\min_{g_\Theta\in G}\hat{R}(g_\Theta)$$
 
 \end{document}
