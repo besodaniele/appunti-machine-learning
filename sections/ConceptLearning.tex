@@ -1,5 +1,83 @@
 \documentclass{../main.tex}[subfiles]
 \begin{document}
 \chapter{Inductive learning: Concept learning}
-
+Prima di iniziare con la spiegazione precisiamo la differenze tra apprendimento induttivo e deduttivo.
+\begin{itemize}
+	\item \textbf{Apprendimento deduttivo}: Approccio di ragionamento dove un sistema applica regole generali per effettuare predizioni riguardanti casi specifici. È il contrario dell'apprendimento induttivo. 
+	L'idea principale è quella di partire da principi generali, teorie o regole note a priori. Applicare queste a situazioni specifiche per determinare risultati.
+	\item \textbf{Apprendimento induttivo}:Un modello apprende regole generali o pattern a partire da esempi specifici o osservazioni.
+	L'idea principale è quella di partire da data points specifici (esempi, dati di training) e cercare di generalizzare da questi esempi per formare un'ipotesi o regola che può prevedere casi sconosciuti.
+\end{itemize}
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|m{3cm}|m{6cm}|m{6cm}|}
+\hline \textbf{} & \textbf{Inductive Learning} & \textbf{Deductive Learning} \\
+\hline
+Definition & Learning patterns and models from data examples. & Applying known rules or logic to derive predictions. \\
+\hline
+Approach & Bottom-up: generalizes from specific training data. & Top-down: uses existing knowledge/rules to reason about new data. \\
+\hline
+Input & Labeled or unlabeled data (e.g., features and labels). & Formal rules, logic statements, or knowledge base. \\
+\hline
+Output & Predictive model or hypothesis (e.g., neural net). & Conclusions derived logically from existing rules. \\
+\hline
+Goal & Learn a function that maps inputs to outputs based on data. & Derive consequences or inferences from rules. \\
+\hline
+Example in ML & Training a classifier on labeled images (e.g., cat vs. dog). & Using a knowledge base and logical inference to classify an image. \\
+\hline
+Common Algorithms & Decision Trees, SVM, Neural Networks, k-NN, etc. & Logic programming, Expert Systems, Prolog-based systems. \\
+\hline
+\end{tabular}
+\caption{Confronto tra Inductive e Deductive Learning}
+\end{table}
+Nell'apprendimento induttivo buona parte del processo di apprendimento involve la raccolta di concetti generali da esempi specifici di training.
+Ogni concetto può essere visto come descrivere un certo sotto insieme di oggetti o eventi definiti su un insieme più ampio. Una definizione alternativa considera ogni concetto come una funzione a valori booleani,
+definita su un insieme più ampio di oggetti (concept learning).
+\section{Concept learning}
+Consideriamo l'azione di apprendere il concetto target \textit{"days on which my friend Aldo enjoys his favorite water sport"}.
+L'obiettivo è prevedere il valore \textit{"enjoy sport"} per un giorno arbitrario, basandosi sui valori degli altri attributi.
+\begin{table}[H]
+\centering
+\begin{tabular}{lllllll}
+\toprule
+\textbf{Sky} & \textbf{Temp} & \textbf{Humid} & \textbf{Wind} & \textbf{Water} & \textbf{Forecast} & \textbf{EnjoySport} \\
+\midrule
+Sunny & Warm & Normal & Strong & Warm & Same & Yes \\
+Sunny & Mid & High & Strong & Warm & Same & Yes \\
+Rainy & Cold & High & Strong & Warm & Change & No \\
+Sunny & Warm & High & Strong & Cool & Change & Yes \\
+\bottomrule
+\end{tabular}
+\caption{EnjoySport dataset}
+\label{tab:enjoysport}
+\end{table} \noindent
+Cominciamo considerando una semplice rappresentazione nella quale ogni ipotesi consiste nella congiunzione dei requisiti sugli attributi delle istanze.
+Ogni ipotesi è un vettore di 6 requisiti, che specifica il valore dei 6 attributi.
+Per ogni attributo l'ipotesi può essere:
+\begin{itemize}
+	\item ?: qualsiasi valore è accettabile
+	\item specifico valore: l'attributo deve avere quel valore
+	\item $\emptyset$: nessun valore è accettabile
+\end{itemize}
+Dunque il nostro obiettivo è trovare le ipotesi $g$ in $G$ tali che $g(x) = 1$ per ogni istanza $x$.\\
+L'ipotesi di apprendimento induttivo ci dice che ogni ipotesi trovata che approssima la funzione di target bene su un insieme di dati di training sufficientemente grande approssimerà anche la funzione target su dati non osservati.
+Il concept learning può essere visto come il processo di cercare in un grande spazio delle ipotesi implicitamente definite dalla rappresentazione delle ipotesi.
+L'obiettivo di questa ricerca è di trovare l'ipotesi che combacia meglio con gli esempi di training.
+Sia $G$ lo spazio di ricerca, allora vogliamo trovare $g$ che meglio "fitta" $D$. Riprendendo l'esempio di prima definiamo i requisiti $< ?, \text{Cold}, \text{High}, ?, ?, ? >$. I possibili valori sono:
+\begin{itemize}
+	\item \textbf{Sky:} Sunny, Cloudy, Rainy
+	\item \textbf{AirTemp:} Warm, Cold, Mid
+	\item \textbf{Humidity:} Normal, High
+	\item \textbf{Wind:} Strong, Weak
+	\item \textbf{Water:} Warm, Cold
+	\item \textbf{Forecast:} Same, Change
+\end{itemize}
+Le possibili istanze sono $3 \times 3 \times 2 \times 2 \times 2 \times 2 = 288$\\
+Le possibili ipotesi distinte sono $|G| = 5\times 5\times 4\times 4\times 4\times 4=6400$ (bisogna considerare anche $\emptyset$ e $?$), queste sono le ipotesi sintatticamente distinte.\\
+Però dobbiamo rimuovere le possibilità che contengono $\emptyset$ in quanto non accettano nessun valore.\\
+$|G|=6400 - 5104 = 1296 = 4 \times 4 \times 3 \times 3 \times 3 \times 3$, che sono le ipotesi semanticamente distinte.
+Ciò viene descritto dalla formula $|G| = \prod_{i=1}^{n} (|D_i| + 1)$, dove $D_i$ è l'insieme dei valori possibili per l'attributo $i$ e $n$ è il numero di attributi.
+\\
+Data la visione del concept learning come problema di ricerca sorge naturalmente la questione dello studio di algoritmi efficienti per ridurre lo spazio delle ipotesi $G$.
 \end{document}
