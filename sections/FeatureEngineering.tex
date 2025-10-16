@@ -114,10 +114,21 @@ In pratica trasformiamo un insieme di $x$ variabili correlate in un insieme di $
 	\item Risolvere $S\underbar{e}=\lambda \underbar{e}$ per trovare gli autovettori $\underbar{e}$ e autovalori $\lambda$ di $S$. L'autovettore è una direzione, l'autovalore ci dice quanta varianze c'è nei dati in quella direzione.
 	\item Risolvere $P=X\underbar{e}$ per calcolare le componenti principali ($N$ componenti)
 \end{enumerate}
-Tecnicamente, la quantità di varianza catturata dalla $i$-esima componente principale è misurata dall'autovalore $\lambda_i$.
+Tecnicamente, la quantità di varianza catturata dalla $i$-esima componente principale è misurata dall'auto valore $\lambda_i$.
 La PCA è particolarmente utile quando le variabili nel dataset sono altamente correlate.
 La correlazione indica che c'è ridondanza nei dati. A causa della ridondanza, la PCA può essere usata per ridurre le variabili originali in un numero minore di variabili (componenti principali), spiegando la maggior parte della varianza delle variabili originali.
 \\
-Gli autovalori possono essre usati per determinare il numero di PC da mantenere dopo la PCA.
-Un autovalore $>1$ indica che le PC contano di più per la varianza che una delle variabili originali.
+Gli autovalori possono essere usati per determinare il numero di PC da mantenere dopo la PCA.
+\begin{itemize}
+	\item Un autovalore $>1$ indica che le PC contano di più per la varianza che una delle variabili originali.
+	\item In maniera alternativa, possiamo limitare il numero di componenti al numero che spiega una certa percentuale della varianza totale. 
+\end{itemize}
+Se voglio ad esempio spiegare almeno il $70\%$ dell'esempio in figura \ref{fig:pcaVarianza}, scelgo le prime 3 componenti.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/pcaVarianza.png}
+	\caption{Varianza spiegata dalle componenti principali}
+	\label{fig:pcaVarianza}
+\end{figure}
+
 \end{document}
