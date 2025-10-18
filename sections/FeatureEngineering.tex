@@ -1,5 +1,4 @@
-\documentclass{../main.tex}[subfiles]
-\begin{document}
+
 \chapter{Feature Engineering}
 \underbar{def.} Trasformare i dati grezzi in feature significative, ovvero variabili che permettono al modello di capire meglio e modellare le relazioni nei dati.
 Idee di base:
@@ -92,16 +91,16 @@ In questo modo le due variabili non sono correlate tra loro.
 
 \begin{tabular}{lll}
 \toprule
-\textbf{Term} & \textbf{Expression} & \textbf{Description} \\
+\textbf{Termine} & \textbf{Espressione} & \textbf{Descrizione} \\
 \midrule
-Covariance matrix & $\Sigma = \frac{1}{n} X^{T} X$ & Describes the variability of the data \\
-Eigenvector & $\phi_i$ & Principal direction (principal component) \\
-Eigenvalue & $\lambda_i$ & Variance explained along $\phi_i$ \\
-Component matrix & $\Phi = [\phi_1, \ldots, \phi_r]$ & Basis of the reduced subspace \\
-Projection & $\hat{x} = \Phi \Phi^{T} x$ & Point projected onto the subspace \\
+Matrice di covarianza & $\Sigma = \frac{1}{n} X^{T} X$ & Descrive la variabilità dei dati \\
+Autovettore & $\phi_i$ & Direzione principale (componente principale) \\
+Autovalore & $\lambda_i$ & Varianza spiegata lungo $\phi_i$ \\
+Matrice delle componenti & $\Phi = [\phi_1, \ldots, \phi_r]$ & Base del sottospazio ridotto \\
+Proiezione & $\hat{x} = \Phi \Phi^{T} x$ & Punto proiettato sul sottospazio \\
 \bottomrule
 \end{tabular}
-\caption{Summary of key concepts in Principal Component Analysis (PCA).}
+\caption{Riepilogo dei concetti chiave dell'Analisi delle Componenti Principali (PCA).}
 \end{table}
 \noindent
 Quindi la PCA è una trasformazione lineare che proietta il dataset in un nuovo sistema di coordinate, dove la prima coordinata ha più varianza,
@@ -130,5 +129,61 @@ Se voglio ad esempio spiegare almeno il $70\%$ dell'esempio in figura \ref{fig:p
 	\caption{Varianza spiegata dalle componenti principali}
 	\label{fig:pcaVarianza}
 \end{figure}
-
-\end{document}
+\subsection{Analisi esplorativa dei dati}
+Consideriamo uno dei dataset più famosi, l'iris dataset.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/iris.png}
+	\caption{Oggetto del dataset iris}
+	\label{fig:iris}
+\end{figure}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{rccccl}
+\toprule
+Id & SepalLengthCm & SepalWidthCm & PetalLengthCm & PetalWidthCm & Species \\
+\midrule
+1   & 5.1 & 3.5 & 1.4 & 0.2 & Iris-setosa \\
+2   & 4.9 & 3.0 & 1.4 & 0.2 & Iris-setosa \\
+3   & 4.7 & 3.2 & 1.3 & 0.2 & Iris-setosa \\
+4   & 4.6 & 3.1 & 1.5 & 0.2 & Iris-setosa \\
+5   & 5.0 & 3.6 & 1.4 & 0.2 & Iris-setosa \\
+\addlinespace
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+\addlinespace
+146 & 6.7 & 3.0 & 5.2 & 2.3 & Iris-virginica \\
+147 & 6.3 & 2.5 & 5.0 & 1.9 & Iris-virginica \\
+148 & 6.5 & 3.0 & 5.2 & 2.0 & Iris-virginica \\
+149 & 6.2 & 3.4 & 5.4 & 2.3 & Iris-virginica \\
+150 & 5.9 & 3.0 & 5.1 & 1.8 & Iris-virginica \\
+\bottomrule
+\end{tabular}
+\caption{Iris dataset — sample rows}
+\label{tab:iris-sample}
+\end{table}
+Adesso mostriamo la distribuzione della lunghezza del petalo rispetto le tre classi.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/irisDistribution.png}
+	\caption{Distribuzione della lunghezza del petalo per le tre specie di iris}
+	\label{fig:irisPetalLength}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/irisDistrAttributes.png}
+	\caption{Distribuzione delle feature del dataset iris}
+	\label{fig:irisPCA}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{pictures/PCAiris.png}
+	\caption{PCA del dataset iris}
+	\label{fig:irisPCA2D}
+\end{figure}
+\noindent
+Possiamo osservare le componenti per analizzare la correlazione tra le feature.
+Le variabili correlate positivamente sono raggruppate insieme, quelle correlate negativamente sono posizionate ai poli opposti del plot rispetto l'origine.
+La distanza tra le variabili e l'origine misura la qualità della variabile, quelle lontane dell'origine sono ben rappresentate.
+Un vettore lungo indica una buona rappresentazione dell'individuo sulle componenti principali.
+Un vettore corto indica che l'individuo non è ben rappresentato dalle componenti principali.
