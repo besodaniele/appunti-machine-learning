@@ -52,3 +52,108 @@ Ogni regione rettangolare viene etichettata con una classe (o una distribuzione 
 	\caption{Esempio di partizionamento dello spazio delle feature tramite un albero di decisione}
 \end{figure}
 Questo partizionamento è chiamato \textit{decision boundary}.
+\section{Espressività degli alberi di decisione}
+Gli alberi di decisione possono esprimere qualsiasi funzione sugli attributi di un input.
+Trivialmente, esiste un albero di decisione consistente per ogni insieme di training con un cammino verso una foglia per ogni esempio, ma probabilmente questo non generalizzerà per nuovi esempi.
+Un "buon" attributo separa gli esempi in sottoinsiemi che sono (idealmente) tutti negativi o tutti positivi.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pictures/separazioneDT.png}
+	\caption{Esempio di albero di decisione che rappresenta la funzione XOR}
+	\label{fig:DTsep}
+\end{figure} \noindent
+Osservando la figura \ref{fig:DTsep}, quale attributo separa meglio gli esempi? Patrons, perché divide gli esempi in due insiemi, uno con tutti esempi positivi e uno con esempi negativi e positivi, tranne in un ramo in cui ho una distribuzione.
+Nel secondo esempio invece non siamo in grado di separare gli esempi basandoci su quell'attributo.
+\\ \\
+Al crescere del numero di nodi (o la profondità) dell'albero, cresce la dimensione dello spazio delle ipotesi.
+Quanti alberi di decisione distinti ci sono con $n$ attributi booleani?
+\begin{itemize}
+	\item Il numero di funzioni booleane su $n$ argomenti.
+	\item Il numero di tabelle di verità distinte con $2^n$ righe.
+	\item $2^{2^n}$ tabelle di verità (dato che ogni riga può essere 0 o 1).
+\end{itemize}
+\section{Apprendimento degli alberi di decisione}
+Gli alberi di decisione effettuano l'analisi del rischio empirico con diverse funzioni di loss in base al problema (regressione o classificazione).
+\subsection{Alberi di decisione di classificazione}
+Vediamo gli alberi di decisione per la classificazione.
+Vogliamo minimizzare il rischio empirico sulla funzione di loss 0-1:
+\[
+R_{emp}(g) = \frac{1}{n} \sum_{i=1}^n 1(g(x_i) \neq y_i)
+\]
+Dove la funzione di loss 0-1 è definita come:
+\[
+L(y, g(x)) = \begin{cases}
+0 & \text{se } y = g(x) \\
+1 & \text{se } y \neq g(x)
+\end{cases}
+\]
+Qual è un problema con questa funzione di loss?
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/loss10.png}
+	\caption{Funzione di loss 0-1}
+\end{figure}
+La funzione di loss 0-1 non è differenziabile, dunque non posso usare metodi basati sul calcolo del gradiente per minimizzarla.
+Un modo per aggirare questo problema è usare funzioni di loss surrogate, più facili da computare, che siano differenziabili e che correlino con la funzione di loss originale.
+\subsection{Alberi di decisione di regressione}
+Come funzione di rischio empirico medio possiamo usare l'errore quadratico medio:
+\[
+R_{emp}(g) = \frac{1}{n} \sum_{i=1}^n (y_i - g(x_i))^2
+\]
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/MSE.png}
+	\caption{Funzione di loss MSE}
+\end{figure}
+\subsection{Difficoltà nel training}
+In generale fare training di alberi di decisione è un problema NP-completo.
+Dunque si usano algoritmi che utilizzano euristiche greedy per costruire l'albero in modo incrementale.
+Si inizia da un albero vuoto, e a ogni passo si sceglie il miglior attributo su cui fare lo split, basandosi su una metrica, poi si ripete il processo ricorsivamente.
+Inoltre, è possibile fermarsi a un albero parziale, senza arrivare alle foglie, perché?
+Secondo il principio del \textbf{rasoio di Occam}, l'ipotesi più semplice che spiega i dati è da preferire.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pictures/overfitting.png}
+	\caption{Esempio di overfitting}
+\end{figure} 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pictures/overfittingCorrelation.png}
+	\caption{Errori in funzione della complessità del modello}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pictures/overfittingTree.png}
+	\caption{Accuratezza in funzione della profondità dell'albero}
+\end{figure}
+\noindent
+Come posso evitare l'overfitting?\\
+Posso fermare la crescita dell'albero quando la separazione dei dati non è più significativa, oppure posso creare l'albero intero e poi potare i rami dopo.
+\\
+Come seleziono il "miglior" albero?
+\\
+Posso misurare le performance su un training set, oppure usare la usare un dataset di validazione.
+
+\begin{algorithm}[h]
+\caption{Algoritmo base per l'apprendimento di alberi di decisione}
+\label{alg:decision-tree-basic}
+\KwIn{Esempi di addestramento $S$, insieme di attributi $A$}
+\KwOut{Albero di decisione con radice \texttt{node}}
+\SetKw{KwAnd}{e}
+node := radice dell'albero di decisione\;
+\While{esistono nodi da espandere}{
+  A := scegliere il "miglior" attributo di decisione per il nodo corrente\;
+  assegnare A come attributo di decisione per il nodo\;
+  \ForEach{valore $v$ di $A$}{
+	creare un nuovo discendente del nodo associato a $v$\;
+  }
+  smistare gli esempi di addestramento ai nodi foglia\;
+  \If{gli esempi di addestramento nei nodi foglia sono perfettamente classificati}{
+	fermarsi\;
+  }
+  \Else{
+	ricorrere sui nuovi nodi foglia\;
+  }
+}
+\Return{node}\;
+\end{algorithm}
