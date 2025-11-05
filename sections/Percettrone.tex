@@ -1,0 +1,150 @@
+\chapter{Percettrone}
+Un percettrone è un classificatore lineare, ovvero classifica l'input disegnando una linea (o iperpiano in dimensioni più alte) che separa le classi.
+Prendendo in input un vettore di feature $x$, lo moltiplica per un vettore di pesi $w$ e aggiunge un bias $b$, dal risultato classifica l'input in base a una soglia.
+\[y = w \cdot x + b
+\]
+Perché è necessario il bias?
+\\
+Il bias permette di spostare la linea di decisione lontano dall'origine, altrimenti la linea passerebbe sempre per l'origine.
+Il bias si comporta come il termine noto in una equazione lineare, dando più flessibilità al modello nel posizionare la linea di decisione.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/percettrone.png}
+	\caption{Schema di un percettrone}
+\end{figure}\noindent
+Il percettrone prende in input un vettore di feature $x = (x_1, x_2, \ldots, x_n)$, pesa ogni feature e fornisce in output una variabile booleana, $y \in \{-1, 1\}$, calcolata attraverso una funzine di attivazione.
+\[
+f(x,w)=\underbrace{\mathrm{sign}}_{\text{Attivazione}}\!\Big(\underbrace{w_1x_1+\cdots+w_nx_n+w_0x_0}_{\text{Integrazione}}\Big)
+\]
+dove $x_0 = 1$ è il termine di bias e $w_0$ è il peso associato al bias che modifica la soglia di attivazione.
+\section{Apprendimento sul percettrone}
+Etichettiamo le classi positive e negative come \(+1\) e \(-1\).\\
+Determiniamo un insieme di parametri ottimali $\theta = \{w_1, w_2, \ldots, w_m\}$ che porti a una combinazione lineare delle feature $x$ e pesi $w$ tali che il modello classifichi tutte le istanze di training.
+\\
+Usiamo una funzione di step come funzione di attivazione $f(w,x)$, dove se $f(w,x)$ è maggiore di un valore di soglia $\alpha$ allora l'output è 1, altrimenti è -1.
+\\
+\\
+Una \textbf{unit step function} può essere vista come un classificatore basato su threshold, ovvero decide se il neurone si attiva o meno in base al valore di input.
+$f(x) = \begin{cases}
++1 & \text{se } wx+b \geq 0 \\
+-1 & \text{se } wx+b < 0
+\end{cases}$
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/classificazionePercettrone.png}
+	\caption{Classificazione tramite percettrone}
+\end{figure}\noindent
+Allora dando un algoritmo di apprendimento per il percettrone:
+\begin{enumerate}
+	\item Vettore di feature $x = (x_1, x_2, \ldots, x_n)$.
+	\item Inizializza i pesi $w$ a valori casuali piccoli.
+	\item Inizializzo il bias $b$.
+	\item Per ogni esempio di training $x_i$ ho una label target $y_i$.
+	\item Calcolo l'output del percettrone $\hat{y_i}=sign(wx+b)$.	
+\end{enumerate}
+\underbar{obiettivo}: aggiornare il vettore $w$ solo quando  $\hat{y_i} \neq y_i$.
+La regola di aggiornamento è:
+\[
+	\begin{aligned}
+		w_{\text{new}} &= w_{\text{old}} + yx \\
+		b_{\text{new}} &= b_{\text{old}} + y
+	\end{aligned}
+\]
+se $y(wx+b) > 0$ la classificazione è corretta, altrimenti si aggiorna $w$ spostandolo nella direzione di $x$ se $y=1$ o nella direzione opposta se $y=-1$.
+\\
+In altre parole:
+\[
+	\text{Se } y(wx+b) \leq 0 \quad \text{allora aggiorniamo: } \begin{cases}
+	w \leftarrow w + yx \\
+	b \leftarrow b + y
+	\end{cases}
+\]
+Quando $y=1$ e viene predetto -1, il peso viene aumentato di $x$, spostando la linea di decisione verso gli esempi positivi.
+Quando $y=-1$ e viene predetto 1, il peso viene diminuito di $x$, spostando la linea di decisione verso gli esempi negativi.
+\\ \\
+Quali sono le forti limitazioni del percettrone semplice?\\
+L'aggiornamento dei pesi viene effettuato di una magnitudine fissa, determinata unicamente dall'input vector $x$ e dalla sua label $y$.
+\\
+Possiamo elencare i seguenti problemi:
+\begin{enumerate}
+	\item Grandezza del passo non controllabile:
+	\begin{itemize}
+		\item La grandezza dell'aggiornamento dipende solo da $||x||$.
+		\item Se gli input variano molto nella loro scala, gli aggiornamenti potrebbero essere troppo grandi (overshooting) o troppo piccoli (convergenza lenta).
+		\item Non c'è un meccanismo di controllo o normalizzazione di questo effetto.
+	\end{itemize}
+	\item Oscillazioni vicino al decision boundary:
+	\begin{itemize}
+		\item Senza un fattore di smorzamento (learning rate), il percettrone può oscillare sul confine di decisione, quindi diverge.
+	\end{itemize}
+	\item Sensibilità alla scala di input:
+	\begin{itemize}
+		\item Se una feature ha una scala molto più grande rispetto alle altre, può dominare l'aggiornamento dei pesi, rendendo non stabile numericamente l'aggiornamento.
+	\end{itemize}
+\end{enumerate}
+\subsection{Learning rate}
+Una soluzione a questi problemi è l'introduzione di un \textbf{learning rate} ($\eta>0 $ piccolo), un fattore di scala che modula la grandezza dell'aggiornamento dei pesi.
+La regole di aggiornamento diventano:
+\[
+\begin{aligned}
+	w_{\text{new}} &= w_{\text{old}} + \eta yx \\
+	b_{\text{new}} &= b_{\text{old}} + \eta y
+\end{aligned}
+\]
+Un $\eta$ grande porta a un apprendimento più veloce ma rischia di fare overshooting.
+Un $\eta$ piccolo porta a un apprendimento più stabile ma più lento.
+\\
+$\eta$ può essere adattato durante l'addestramento, iniziando con un valore più grande e diminuendolo nel tempo per convergere, questa è la fondazione delle tecniche di ottimizzazioni moderne.
+\\ \\
+L'aggiornamento dei pesi può avvenire in due modi:
+\begin{itemize}
+	\item \textbf{Online}: i pesi vengono aggiornati dopo ogni esempio di training $\rightarrow$ \textbf{Stochastic Gradient Descent}.
+	\item \textbf{Batch}: gli aggiornamenti vengono accumulati su tutti gli esempi che vengono classificati male.
+\end{itemize}
+\begin{theorem}
+	\textbf{Teorema di Rosenblatt}\\
+	Se il dataset di training è linearmente separabile, l'addestramento del percettrone converge sempre a una ipotesi consistente dopo un numero finito di epoche, per ogni $\eta > 0$.
+	Se il dataset non è linearmente separabile, dopo un certo numero di epoche i pesi cominceranno a oscillare.
+\end{theorem}
+\subsection{Delta rule}
+Invece di aggiornare i pesi solo quando una classificazione viene fatta in modo errato, possiamo usare la \textbf{delta rule} che aggiorna i pesi in proporzione alla magnitudo dell'errore (ovvero la differenza tra l'output desiderato e l'output reale).
+\\
+Dato un vettore di input $x$, la label target $y$, l'output del percettrone $\hat{y}=wx+b$ e il learning rate $\eta$, la regola di aggiornamento diventa:
+\[
+\begin{aligned}
+	w_{\text{new}} &= w_{\text{old}} + \eta (y - \hat{y}) x \\
+	b_{\text{new}} &= b_{\text{old}} + \eta (y - \hat{y})
+\end{aligned}
+\]
+Vogliamo che il neurone produca un output $\hat{y}$ il più vicino possibile alla label target $y$.
+Dunque, definiamo una funzione di loss che misura quanto si sia sbagliato il modello:
+\[L(y, \hat{y}) = \frac{1}{2}(y - \hat{y})^2
+\]
+Quindi l'obbiettivo è minimizzare questo errore rispetto ai pesi $w$ e al bias $b$.
+Calcoliamo come l'errore L varia rispetto a ogni peso $w_j$:
+\[\frac{\partial L}{\partial w_j} = -(y - \hat{y}) x_j
+\]
+e rispetto al bias:
+\[\frac{\partial L}{\partial b} = -(y - \hat{y})
+\]
+Queste derivate ci dicono in quale direzione spostare ogni parametro per ridurre l'errore.\\ \\
+La discesa del gradiente ci dice che dobbiamo aggiornare i pesi e il bias nella direzione opposta al gradiente (visto che il gradiente punta nella direzione di massima crescita dell'errore).
+Dunque aggiorniamo i pesi e il bias come segue:
+\[
+\begin{aligned}
+	w_j &\leftarrow w_j - \eta \frac{\partial L}{\partial w_j} \\
+\end{aligned}
+\]
+Sostituendo le derivate nella regola di aggiornamento otteniamo:
+\[\begin{aligned}
+	w_j &\leftarrow w_j + \eta (y - \hat{y}) x_j \\
+	b &\leftarrow b + \eta (y - \hat{y})
+\end{aligned}
+\]
+La spiegazione intuitiva del perché funziona è che:
+\begin{itemize}
+	\item Se l'output $\hat{y}$ è troppo basso rispetto a $y$, allora $(y - \hat{y})$ è positivo, quindi aumentiamo i pesi per aumentare l'output.
+	\item Se l'output $\hat{y}$ è troppo alto rispetto a $y$, allora $(y - \hat{y})$ è negativo, quindi diminuiamo i pesi per ridurre l'output.
+\end{itemize}
+\section{Limiti dei modelli lineari}

@@ -38,8 +38,8 @@ Cosa succede se codifico con one-hot e calcolo la distanza euclidea (radice dell
 	\item \textbf{Combinazione di feature}: creo nuove feature combinando più feature 
 	\item \textbf{Creazione di nuove features da più vecchie features}. Che problemi ha? Viene modificata la relazione che sto apprendendo. 
 \end{enumerate}
-Con il metodo $1$ e $3$ ho il problema di \textbf{curse of dimensionality}, ovvero il numero di campioni (necessari per avere la stessa accuratezza) cresce esponenzialmente con il numero di feature. Ma nella pratica il numero di esempi di training è fisso, dunque le performance in generale calano per alti numeri di features.
-In molti casi l'informazione che viene persa dalla rimozioni di variabili viene compensata da un miglior training in uno spazio di dimensione minore.
+Con il metodo $2$ e $3$ ho il problema di \textbf{curse of dimensionality}, ovvero il numero di campioni (necessari per avere la stessa accuratezza) cresce esponenzialmente con il numero di feature. Ma nella pratica il numero di esempi di training è fisso, dunque le performance in generale calano per alti numeri di features.
+In molti casi l'informazione che viene persa dalla rimozione di variabili viene compensata da un miglior training in uno spazio di dimensione minore.
 \section{Feature reduction}
 In maniera ingenua possiamo pensare che più feature abbiamo, meglio è. In pratica, in molti casi, avere troppe feature può essere dannoso, vogliamo feature con un forte potere discriminante.
 Due strategie tipiche:

@@ -112,7 +112,7 @@ Utilizziamo $u$ per denotare i dati di input grezzi, ad esempio un vettore, test
 $x=\phi(u)$ è il vettore di features, ottenuto tramite la funzione $\phi$, chiamata embedding, funzione feature o mappamento di feature. La funzione $\phi$ può variare molto nel livello di complessità in base al caso.
 \section{Modelli}
 Noi cerchiamo un predittore (o modello) $g_\theta:\mathbb{R}^d\to \mathbb{R}^m$ che dato un vettore di features $x\in \mathbb{R}^d$ produce una predizione $\hat{y}=g_\theta(x)\in \mathbb{R}^m$.
-La scelta del modello $g_\theta$ viene effettuata sia in basa ai dati a disposizione che in base alle conoscenze pregresse.
+La scelta del modello $g_\theta$ viene effettuata sia in base ai dati a disposizione che in base alle conoscenze pregresse.
 In termini di dati grezzi, il predittore è  $\hat{v}=\psi^{-1}(g(\phi(u)))$, con qualche variante se la funzione $\psi$ è invertibile.
 Se $\hat{y}\approx y$ allora il predittore ha fatto una buona predizione sulla $i$-esima coppia di dati. Però, l'obiettivo è avere $\hat{y}\approx y$ non solo sui dati di training, ma anche su dati mai visti prima.
 Due forme equivalenti per rappresentare un modello sono $\hat{y}=g_\theta(x)$ e $\hat{y}=g(x,\theta)$. Si dice che la funzione $g$ da la struttura (o forma) del predittore, $\theta$ è un parametro per il modello predittivo

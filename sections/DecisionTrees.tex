@@ -134,7 +134,7 @@ Come seleziono il "miglior" albero?
 \\
 Posso misurare le performance su un training set, oppure usare la usare un dataset di validazione.
 
-\begin{algorithm}[h]
+\begin{algorithm}[H]
 \caption{Algoritmo base per l'apprendimento di alberi di decisione}
 \label{alg:decision-tree-basic}
 \KwIn{Esempi di addestramento $S$, insieme di attributi $A$}
@@ -142,7 +142,7 @@ Posso misurare le performance su un training set, oppure usare la usare un datas
 \SetKw{KwAnd}{e}
 node := radice dell'albero di decisione\;
 \While{esistono nodi da espandere}{
-  A := scegliere il "miglior" attributo di decisione per il nodo corrente\;
+  A := scegliere il ``miglior'' attributo di decisione per il nodo corrente\;
   assegnare A come attributo di decisione per il nodo\;
   \ForEach{valore $v$ di $A$}{
 	creare un nuovo discendente del nodo associato a $v$\;
@@ -156,4 +156,232 @@ node := radice dell'albero di decisione\;
   }
 }
 \Return{node}\;
-\end{algorithm}
+\end{algorithm}f
+\section{Algoritmi di apprendimento su alberi di decisione}
+Come determinare il "miglior" attributo su cui fare lo split?
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/split/split1.png}
+	\caption{Determinazione dell'attributo}
+\end{figure}
+L'idea di base è che un buon attributo separa bene gli esempi in sottoinsiemi che sono (idealmente) tutti negativi o tutti positivi.
+\subsection{CART (1984)}
+Con questo algoritmo viene effettuata una divisione binaria ricorsivamente.
+\begin{itemize}
+	\item Per ogni nodo, viene cercata la miglior separazione binaria tra tutte le possibili feature e tutti i possibili valori di soglia.
+	\item La separazione viene scelta in base alla riduzione dell'impurità (misurata tramite Gini impurity index).
+\end{itemize}
+\textbf{L'indice di Gini} è una misura di quanto "puro" o "impuro" è un nodo in un albero di classificazione, ovvero misura la distribuzione delle classi al livello di nodo.
+\[
+Gini(D) = \sum_{i=1}^{J} (p_i\sum_{k\neq i} p_k) = \sum_{i=1}^{J} (p_i-p_i^2)  = \sum_{i=1}^{J} p_i - \sum_{i=1}^{J} p_i^2 = 1 - \sum_{i=1}^{J} p_i^2
+\]
+Il livello massimo di purità è 0, quando tutti gli esempi appartengono a una sola classe.
+Il livello massimo di impurità è $\frac{m-1}{m}$, avendo $m$ classi.
+\subsubsection{Problemi di CART}
+CART gestisce bene i dati numerici, ma non è ottimale per dati categorici con più di due valori distinti.
+Supponiamo di avere un attributo categorico con $k$ valori distinti, allora il numero di possibili split binari è $2^{k-1}-1$, che cresce esponenzialmente con $k$.
+\subsection{ID3 (1986)}
+L'algoritmo ID3 (Iterative Dichotomiser 3) è un altro algoritmo per la costruzione di alberi di decisione.
+Utilizza un approccio top-down per dividere le feature a ogni passo per costruire un albero di decisione.
+Il funzionamento è basato sul concetto di \textbf{entropia}.
+\subsubsection{Entropia}
+Sia $S$ l'insieme degli esempi di addestramento, e $p_\oplus$ e $p_\ominus$ le proporzioni di esempi positivi e negativi in $S$.
+L'entropia misura l'impurità di $S$.
+\[
+Entropy(S) = -p_\oplus \log_2 p_\oplus - p_\ominus \log_2 p_\ominus
+\]
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.4\textwidth]{pictures/split/entropia.png}
+	\caption{Valori di entropia in funzione della proporzione di esempi positivi}
+\end{figure}\noindent
+Una definizione alternativa dell'entropia ci dice che $Entropy(S)$ è la quantità media di informazione (in bit) necessaria per codificare la classe di un esempio scelto casualmente da $S$, in una codifica ottimale di lunghezza minima.
+\\
+L'entropia misura quindi il livello di incertezza associato alla classificazione di un esempio scelto casualmente da $S$.
+Di conseguenza ci dice il numero di bit necessari in media per codificare la classe di un esempio scelto casualmente da $S$.
+\begin{itemize}
+  \item Se tutti gli esempi appartengono alla stessa classe ("\(+\)"), non c'è incertezza \(\rightarrow\) non servono bit per comunicare l'etichetta \(\rightarrow\) entropia \(=0\).
+  \item Se metà sono "\(+\)" e metà sono "\(-\)", l'incertezza è massima \(\rightarrow\) servono più bit per codificare la classe \(\rightarrow\) entropia massima (\(=1\) bit, nel caso binario).
+  \item Se il 90\% è "\(+\)" e il 10\% è "\(-\)", in media servono meno di 1 bit: entropia \(\approx 0.47\).
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lccp{6cm}}
+\toprule
+Situazione & Probabilità di classe & Entropia (bit) & Significato \\
+\midrule
+Tutti "\(+\)" & \((p_{+}=1,\; p_{-}=0)\) & \(0\) & Nessuna incertezza \(\rightarrow\) non servono bit \\
+50\% "\(+\)", 50\% "\(-\)" & \((p_{+}=0.5,\; p_{-}=0.5)\) & \(1\) & Incertezza massima \(\rightarrow\) 1 bit \\
+90\% "\(+\)", 10\% "\(-\)" & \((p_{+}=0.9,\; p_{-}=0.1)\) & \(\approx 0.47\) & In media, meno di 1 bit \\
+\bottomrule
+\end{tabular}
+\caption{Esempi numerici di entropia per una distribuzione binaria}
+\label{tab:entropia-esempi}
+\end{table} \noindent
+Secondo la teoria dell'informazione di Shannon, l'informazione associata a un evento con probabilità $p$ è definita come:
+\[I(p) = -\log_2(p)
+\]
+Ciò rappresenta inoltre il numero minimo di bit (mediamente) necessari per codificare l'evento.
+Al crescere della probabilità di un evento, il numero di bit necessari per codificarlo diminuisce.
+\\
+Dato che possiamo estrarre casualmente un esempio $+$ con probabilità $p_\oplus$ e un esempio $-$ con probabilità $p_\ominus$, il numero di bit necessari è:
+\[Entropy(S) = -[p_\oplus \log_2(p_\oplus) + p_\ominus \log_2(p_\ominus)]\]
+Qual è la relazione tra entropia e apprendimento degli alberi di decisione?
+L'algoritmo cerca di ridurre l'entropia scegliendo gli attributi che separano i dati in sottoinsiemi più puri.
+Ogni separazione fornisce informazioni, dunque riduce il numero medio di bit necessari per codificare la classe, ovvero riduce l'entropia.
+\\
+Facciamo un esempio su un dataset con 10 esempi, 4 positivi e 6 negativi.
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{rlll}
+\toprule
+Person & Age & Income & Buy? \\
+\midrule
+1  & young   & high & No  \\
+2  & young   & mid  & No  \\
+3  & young   & low  & Yes \\
+4  & adult   & high & Yes \\
+5  & adult   & mid  & Yes \\
+6  & adult   & low  & Yes \\
+7  & elderly & high & No  \\
+8  & elderly & mid  & No  \\
+9  & elderly & low  & No  \\
+10 & young   & low  & Yes \\
+\bottomrule
+\end{tabular}
+\caption{Esempio: età, reddito e decisione di acquisto}
+\label{tab:age-income-buy}
+\end{table}
+L'entropia iniziale (al nodo radice) è:
+\[p_{yes} = \frac{4}{10}, \quad p_{no} = \frac{6}{10}\]
+\[H(S) = -\left(\frac{4}{10} \log_2 \frac{4}{10} + \frac{6}{10} \log_2 \frac{6}{10}\right) \approx 0.97 \text{ bit}\]
+Questo vuol dire che se volessimo codificare la classe (si/no) di una persona scelta casualmente, in media servirebbero circa 0.97 bit, questo vuol dire che l'incertezza è alta.
+Vogliamo quindi trovare una divisione che riduce l'incertezza.
+\\
+Proviamo a dividere in base all'attributo Age:
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Age & Yes & No & Totale & $p_{\text{yes}}$ & Entropia \\
+\midrule
+young   & 2 & 2 & 4 & 0.5 & 1.0 \\
+adult   & 3 & 0 & 3 & 1.0 & 0.0 \\
+elderly & 0 & 3 & 3 & 0.0 & 0.0 \\
+\bottomrule
+\end{tabular}
+\caption{Split per attributo Age: conteggi, probabilità di "Yes" ed entropia per ciascun sottoinsieme}
+\label{tab:age-split}
+\end{table}
+Calcoliamo ora l'entropia media dopo lo split:
+\[H_{after} = \frac{4}{10} \cdot 1.0 + \frac{3}{10} \cdot 0.0 + \frac{3}{10} \cdot 0.0 = 0.4 \text{ bit}\]
+L'entropia è diminuita da 0.97 bit a 0.4 bit, dunque lo split ha ridotto l'incertezza.
+Misuriamo questa riduzione di entropia tramite l'\textbf{information gain}:
+\[IG(S, \text{Age}) = H(S) - H_{after} = 0.97 - 0.4 = 0.57 \text{ bit}\]
+Ora immaginiamo di creare un albero di decisione basandoci su un unico attributo. Vogliamo decidere se usare Humidity o Wind come attributo di split.
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l l l l l}
+\toprule
+Day & Outlook & Temp. & Humidity & Wind & Play Tennis \\
+\midrule
+D1  & Sunny    & Hot  & High   & Weak   & No  \\
+D2  & Sunny    & Hot  & High   & Strong & No  \\
+D3  & Overcast & Hot  & High   & Weak   & Yes \\
+D4  & Rain     & Mild & High   & Weak   & Yes \\
+D5  & Rain     & Cool & Normal & Weak   & Yes \\
+D6  & Rain     & Cool & Normal & Strong & No  \\
+D7  & Overcast & Cool & Normal & Strong & Yes \\
+D8  & Sunny    & Mild & High   & Weak   & No  \\
+D9  & Sunny    & Cool & Normal & Weak   & Yes \\
+D10 & Rain     & Mild & Normal & Weak   & Yes \\
+D11 & Sunny    & Mild & Normal & Strong & Yes \\
+D12 & Overcast & Mild & High   & Strong & Yes \\
+D13 & Overcast & Hot  & Normal & Weak   & Yes \\
+D14 & Rain     & Mild & High   & Strong & No  \\
+\bottomrule
+\end{tabular}
+\caption{Esempio: dataset "Play Tennis" (14 esempi)}
+\label{tab:play-tennis}
+\end{table}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/split/humidityWind.png}
+	\caption{Alberi di decisione basati su Humidity e Wind}
+\end{figure}
+Dunque possiamo concludere che Humidity è un attributo migliore di Wind per fare lo split, dato che riduce maggiormente l'entropia.
+\subsubsection{Problemi di ID3}
+\begin{itemize}
+	\item L'entropia al livello teorico è una buona strategia, ma computazionalmente è costosa dato il calcolo del logaritmo (si può approssimare con le serie di Taylor).
+	\item L'information gain è sensibile alle classi molto sbilanciate (entropia risultante molto alta dunque basso information gain).
+	\item Bias rispetto agli attributi che possono assumere molti valori distinti (può causare overfitting).
+\end{itemize}
+\subsection{C4.5 (1993)}
+Questo algoritmo utilizza il $gain ratio$ per regolare l'information gain dividendolo per una misura di \textbf{split information} che riflette quanto largamente un dato sia diviso.
+\[
+Gain\ Ratio(S, A) = \frac{Information\ Gain(S, A)}{Split\ Information(S, A)}
+\]
+Dove lo split information è definito come:
+\[
+Split\ Information(S, A) = - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} \log_2 \frac{|S_v|}{|S|}
+\]
+Split information è alto quando un attributo divide i dati in molte piccole porzioni. 
+Dividendo IG per lo split information, il gain ratio penalizza gli attributi che creano troppe partizioni.
+\\
+Se l'attributo A divide i dati in modo equo (e.g. 50-50), lo split information è alto, perché i dati vengono "distribuiti" in maniera equa tra le partizioni.
+Se invece un attributo crea delle partizioni molto sbilanciate (e.g. 95-5), lo split information è basso, perché viene a malapena creata una partizione.
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{l l c p{6.5cm}}
+\toprule
+Attributo & Valori distinti & SplitInfo & Nota \\
+\midrule
+A & 60 / 40 & $\approx 0.97$ & Split bilanciato, informazione media \\
+B & 50 / 50 & $1.00$ & Split perfettamente bilanciato \\
+C & 100 valori unici & $6.64$ & Split information molto alta $\;\Rightarrow\;$ l'Information Gain viene penalizzato \\
+D & 90 / 5 / 5 & $0.57$ & Split molto sbilanciato, scarsa informazione utile \\
+\bottomrule
+\end{tabular}
+\caption{Confronto di split per diversi attributi}
+\label{tab:split-info-esempi}
+\end{table}
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{l c c c c}
+\toprule
+Attributo & Valori distinti & Information Gain & Split Info & Gain Ratio \\
+\midrule
+Color      & 3   & 0.30 & 1.20 & 0.25 \\
+Student ID & 100 & 1.00 & 6.60 & 0.15 \\
+Age Group  & 4   & 0.40 & 1.50 & 0.27 \\
+\bottomrule
+\end{tabular}
+\caption{Confronto di Information Gain, Split Info e Gain Ratio per alcuni attributi}
+\label{tab:gainratio-esempi-2}
+\end{table}
+Come vengono gestiti gli attributi numerici in C4.5?
+\begin{enumerate}
+	\item Ordinare i valori numerici dell'attributo.
+	\item Considerare dei valori di soglia candidati, tipicamente i valori medi tra i valori ordinati dove la label cambia.
+	\item Separare in due gruppi per ogni soglia.
+	\item Calcolare il gain ratio per ogni soglia.
+	\item Scegliere la soglia con il gain ratio più alto.
+\end{enumerate}
+\subsubsection{Problemi di C4.5}
+Il problema principale è che il gain ratio favorisce gli split che dividono poco i dati, ad esempio con split info molto basso.
+Se split info è molto basso, il denominatore del gain ratio è piccolo, dunque il gain ratio diventa artificialmente alto anche se l'information gain è basso.
+Dunque il modello potrebbe scegliere divisioni con "rami sbilanciati" che non migliorano la classificazione, peggiorando le performance.
+\\
+Inoltre, C4.5 non sceglie direttamente gli attributi con il gain ratio più alto, ma prima filtra gli attributi con information gain molto basso, poi seleziona gli attributi con il gain ratio più alto tra quelli rimanenti.
+Il gain ratio quindi corregge il bias dell'information gain rispetto agli attributi con molti valori distinti, ma introduce un bias verso attributi che dividono poco i dati (basso split info).
+\subsubsection{Gestione dei valori mancanti}
+Quando un valore di un attributo è mancante su delle istanze, l'istanza non viene scartata.
+Viene stimata la probabilità di ogni possibile valore dell'attributo mancante basandosi sulle altre istanze note.
+Quando viene computato l'information gain e il gain ratio per quell'attributo, l'istanza contribuisce frazionalmente a ogni possibile ramo, pesata dalla probabilità stimata di quel valore.
