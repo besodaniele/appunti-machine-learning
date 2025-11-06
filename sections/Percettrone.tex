@@ -148,3 +148,42 @@ La spiegazione intuitiva del perché funziona è che:
 	\item Se l'output $\hat{y}$ è troppo alto rispetto a $y$, allora $(y - \hat{y})$ è negativo, quindi diminuiamo i pesi per ridurre l'output.
 \end{itemize}
 \section{Limiti dei modelli lineari}
+La classe di ipotesi di modelli lineari (o log-lineari) è seriamente limitata.
+Ad esempio, non possono risolvere problemi non linearmente separabili come l'operazione XOR.
+\[
+\begin{aligned}
+	\text{xor}(0,0) & = 0 \\
+	\text{xor}(0,1) & = 1 \\
+	\text{xor}(1,0) & = 1 \\
+	\text{xor}(1,1) & = 0 \\
+\end{aligned}
+\]
+Non esiste un $w\in\mathbb{R}^2$ e un $b\in\mathbb{R}$ tali che:
+\[\begin{aligned}
+	(0,0)\cdot w + b & < 0\\
+	(1,0)\cdot w + b & \geq 0\\
+	(0,1)\cdot w + b & \geq 0\\
+	(1,1)\cdot w + b & < 0\\
+\end{aligned}
+\]
+Questo perché non esiste una linea che possa separare i punti (0,1) e (1,0) dai punti (0,0) e (1,1) in un piano 2D.
+Però è possibile trasformare l'input utilizzando una funzione non lineare per rendere i punti separabili linearmente.\\
+In generale, addestriamo un classificatore lineare su un dataset che non è linearmente separabile definendo una funzione che "linearizza" i dati.
+Tuttavia, nella maggior parte dei casi la dimensione dello spazio delle feature è molto più alta che lo spazio originale degli input, inoltre dobbiamo definire una funzione di mapping $\phi$.
+Le support vector machines (SVM) approcciano il problema definendo un insieme di mapping, che mappano i dati in uno spazio di grande dimensione.
+\\
+Un esempio è il mapping polinomiale $\phi(x)=x^d$, per $d=2$:
+\[
+\phi(x_1, x_2) = (x_1, x_2, x_1 x_1, x_2 x_2, x_1 x_2)
+\]
+Ovvero tutte le combinazioni delle due variabili.
+\\
+Nonostante ora siamo in grado di addestrare un classificatore lineare per il problema dello XOR, abbiamo un incremento polinomiale nel numero dei parametri (non efficiente).
+\\ \\
+Un approccio diverso è quello di definire una funzione di mapping non lineare addestrabile, può prendere la forma di un modello parametrizzato lineare, accoppiato a una funzione non lineare di attivazione $g$.
+\[
+\begin{aligned}
+	\hat{y} = \phi(x)W+b \\
+	\phi(x) = g(xW'+b)
+\end{aligned}
+\]

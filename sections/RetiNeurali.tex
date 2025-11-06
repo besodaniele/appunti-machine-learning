@@ -1,0 +1,202 @@
+\chapter{Reti neurali}
+Una rete neurale artificiale (Artificial Neural Network, ANN) incorpora i due componenti fondamentali delle reti neurali biologice: i neuroni (nodi) e le sinapsi (pesi).
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{pictures/ANN/ANN.png}
+	\caption{Rappresentazione schematica di una rete neurale artificiale.}
+\end{figure}
+Dove a ogni nodo corrisponde una funzione di attivazione che elabora gli input ricevuti dai nodi collegati tramite i pesi sinaptici.
+Lo scopo delle funzioni di attivazione è quello di introdurre non linearità nel modello, permettendo alla rete di apprendere e rappresentare relazioni complesse tra input e output.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/AF.png}
+	\caption{Esempi di funzioni di attivazione lineare e non lineari.}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/example1.png}
+	\caption{Esempio di rete neurale artificiale semplice con due input, un layer nascosto e un output.}
+	\label{fig:example1}
+\end{figure}\noindent
+Nella figura \ref{fig:example1} possiamo vedere un esempio di rete neurale dove in un nodo viene calcolato a partire dagli input $x_1$ e $x_2$ il valore:
+\[\begin{aligned}
+(1 \cdot x_1 + 0.5 \cdot x_2) & = -0.5 \\
+\text{Con funzione di attivazione: } & \frac{1}{1+e^{0.5}}=-0.3775 \\
+\end{aligned}\]
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/error.png}
+	\caption{Esempio di errore nella classificazione}
+	\label{fig:example2}
+\end{figure}
+Nella figura \ref{fig:example2} possiamo vedere un esempio di errore nella classificazione, come possiamo addestrare il modello per correggere questo errore?
+\section{Backpropagation}
+La backpropagation è un algoritmo principale per addestrare le reti neurali artificiali.
+L'obiettivo è aggiustare i pesi per minimizzare la funzione di loss (differenza tra prediction e target).
+\\
+Quando una rete neurale fa una previsione:
+\begin{enumerate}
+	\item L'input viene passato avanti attraverso la rete per produrre un output (forward pass).
+	\item L'output viene confrontato con il target utilizzando una funzione di loss per calcolare l'errore.
+	\item L'algoritmo calcola quanto ogni peso ha contribuito all'errore totale.
+	\item L'algoritmo propaga l'errore all'indietro attraverso la rete (backward pass).
+	\item I pesi vengono aggiornati utilizzando la discesa del gradiente per ridurre l'errore.
+\end{enumerate}
+La regola della catena (analisi matematica) è la base della backpropagation.
+Se abbiamo delle funzioni composte $y=f(u)$ e $u=g(x)$, quindi $y=f(g(x))$, per vedere quanto $y$ cambia al variare di $x$ usiamo la regola della catena:
+\[\frac{dy}{dx}=\frac{dy}{du} \cdot \frac{du}{dx}\]
+Dove $\frac{dy}{du}$ è la derivata di $f$ rispetto a $u$ (mostra quanto $y$ cambia al variare di $u$) e $\frac{du}{dx}$ è la derivata di $g$ rispetto a $x$ (mostra quanto $u$ cambia al variare di $x$).
+Se abbiamo un numero maggiore di funzioni possiamo sempre applicare la regola della catena.
+\\
+Supponiamo che la nostra rete neurale abbia $L$ layer:
+\begin{itemize}
+	\item \textbf{Forward pass:}
+		Per ogni layer $l$ da $1$ a $L$:
+		\begin{itemize}
+			\item Calcoliamo la combinazione lineare degli input: $z^{[l]}=W^{[l]}a^{[l-1]}+b^{[l]}$
+			\item Applichiamo la funzione di attivazione: $a^{[l]}=\sigma^{[l]}(z^{[l]})$
+			\item N.B. $a^{[0]}$ è l'input della rete.
+		\end{itemize}
+	\item \textbf{Backward pass:}
+	\begin{enumerate}
+		\item Calcoliamo il gradiente della funzione di loss rispetto all'output: $\delta^{[L]}=\nabla_a \mathcal{L} \odot \sigma'^{[L]}(z^{[L]})$
+		\item Per ogni layer $l$ da $L-1$ a $1$ calcolo
+		\[
+		\delta^{[l]}=(W^{[l+1]})^T \delta^{[l+1]} \odot \sigma'^{[l]}(z^{[l]})
+		\]
+		\item Calcoliamo i gradienti dei pesi e dei bias:
+		\[ \begin{aligned}
+			\frac{\partial \mathcal{L}}{\partial W^{[l]}}=&\delta^{[l]} (a^{[l-1]})^T \\
+			\frac{\partial \mathcal{L}}{\partial b^{[l]}}=&\delta^{[l]}
+		\end{aligned}
+		\]
+		\item Aggiorniamo i pesi (usando gradient descent):
+		\[ \begin{aligned}
+			W^{[l]}=&W^{[l]} - \eta \frac{\partial \mathcal{L}}{\partial W^{[l]}} \\
+			b^{[l]}=&b^{[l]} - \eta \frac{\partial \mathcal{L}}{\partial b^{[l]}}
+		\end{aligned}
+		\]
+	\end{enumerate}
+\end{itemize}
+\section{Esempio di simulazione}
+\subsubsection{Forward pass}
+Ora mostriamo come un segnale si propaga nella rete, i simboli $w_{(xm)n}$ rappresentano i pesi delle connessioni tra l'input $x_m$ e il neurone $n$. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/ANN/simulation/1.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/2.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/3.png}
+\end{figure} \noindent
+Propagazione dei segnali attraverso il layer nascosto. I simboli $w_{mn}$ rappresentano i pesi delle connessioni tra l'output del neurone $m$ e input del neurone $n$ del layer dopo.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/4.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/5.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/6.png}
+\end{figure}
+Il segnale viene propagato fino all'output.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/7.png}
+\end{figure}
+\subsubsection{Backward pass}
+In questo step il segnale di output della rete $y$ viene confrontato con il il valore di output desiderato (target), trovato nel dataset di addestramento.
+La differenza si chiama segnale di errore $\delta$ del neurone di output, nota che $\delta$ è la derivata della funzione di loss.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/8.png}
+\end{figure}
+Viene propagato il segnale $\delta$ di errore all'indietro attraverso la rete.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/9.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/10.png}
+\end{figure} \noindent
+I pesi usati per propagare l'errore all'indietro sono uguali a quelli usati durante la computazione in avanti. Solo la direzione del flusso di dati cambia.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/11.png}
+\end{figure}\noindent
+Quando il segnale di errore di ogni neurone viene calcolato, i pesi di ogni nodo di input vengono aggiornati in base alla derivata della funzione di attivazione (di cui modifico i pesi).
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/12.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/13.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/ANN/simulation/14.png}
+\end{figure}
+\section{Stochastic gradient descent (SGD)}
+Algoritmo di ottimizzazione generico, riceve una funzione $f$ parametrizzata secondo $\theta$, una funzione di loss $\mathcal{L}$ e delle coppie input-target $(x_i, y_i)$.
+L'obiettivo è di impostare i parametri $\theta$ in modo che la loss cumulativa di $f$ sugli esempi di training sia minimizzata.
+\[
+\mathcal{L}(\theta)=\sum_{i=1}^{n} L(f(x_i; \theta), y_i)
+\]
+
+\begin{algorithm}[H]
+\caption{Addestramento online con Stochastic Gradient Descent (SGD)}
+\label{alg:sgd-online}
+\KwIn{\begin{itemize}
+	\item Funzione parametrizzata $f(x;\Theta)$
+	\item Funzione di loss $L(\hat{y},y)$
+	\item Esempi di addestramento $(x_i,y_i)$
+	\item Tasso di apprendimento $\eta_t$
+	\end{itemize}}
+\KwOut{Parametri ottimizzati $\Theta$}
+\While{criteri di arresto non soddisfatti}{
+  campiona un esempio di addestramento $(x_i,y_i)$\;
+  calcola la loss locale $L\big(f(x_i;\Theta),y_i\big)$\;
+  calcola il gradiente stimato \(\hat{g}\leftarrow \nabla_{\Theta} L\big(f(x_i;\Theta),y_i\big)\)\;
+  aggiorna i parametri: \(\Theta \leftarrow \Theta - \eta_t \,\hat{g}\)\;
+}
+\Return $\Theta$\;
+\end{algorithm}\noindent
+L'algoritmo comincia estraendo un esempio di addestramento alla volta e calcolando la loss locale.
+Successivamente calcola il gradiente stimato della loss rispetto ai parametri $\Theta$ usando l'esempio corrente.
+Si assume che l'input e la predizione siano parametri fissi, quindi la loss viene trattata come una funzione solo di $\Theta$.
+Infine, i parametri $\theta$ vengono aggiornati nella direzione opposta al gradiente, scalato per il learning rate $\eta_t$.\\
+Si noti che l'errore è calcolato su un singolo esempio, dunque una stima grezza dell'intero dataset di addestramento che vogliamo minimizzare, questo portebbe portare a calcolare dei gradienti poco accurati.
+\\\\
+Per migliorare la stima del gradiente, si può usare il mini-batch gradient descent, che calcola la loss su un piccolo sottoinsieme di esempi di addestramento (mini-batch) invece che su un singolo esempio.
+\\
+\begin{algorithm}[H]
+\caption{Addestramento con Minibatch Stochastic Gradient Descent}
+\label{alg:sgd-minibatch}
+\KwIn{\begin{itemize}
+  \item Funzione parametrizzata $f(x;\Theta)$
+  \item Funzione di loss $L(\hat{y},y)$
+  \item Esempi di addestramento $\{(x_i,y_i)\}_{i=1}^n$
+  \item Dimensione del minibatch $m$
+  \item Tasso di apprendimento $\eta_t$
+\end{itemize}}
+\KwOut{Parametri ottimizzati $\Theta$}
+\While{criteri di arresto non soddisfatti}{
+  campiona un minibatch di $m$ esempi $\{(x_1,y_1),\ldots,(x_m,y_m)\}$\;
+  $\hat{g}\leftarrow 0$\;
+  \For{$i\leftarrow 1$ \KwTo $m$}{
+    calcola il gradiente locale $\;g_i \leftarrow \nabla_{\Theta} L\big(f(x_i;\Theta),y_i\big)$\;
+    $\hat{g}\leftarrow \hat{g} + \frac{1}{m}\,g_i$\;
+  }
+  aggiorna i parametri: $\Theta \leftarrow \Theta - \eta_t\,\hat{g}$\;
+}
+\Return $\Theta$\;
+\end{algorithm}

@@ -328,7 +328,7 @@ Gain\ Ratio(S, A) = \frac{Information\ Gain(S, A)}{Split\ Information(S, A)}
 \]
 Dove lo split information è definito come:
 \[
-Split\ Information(S, A) = - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} \log_2 \frac{|S_v|}{|S|}
+Split\ Information(S, A) = - \sum_{v \in Values(A)} p_v \log_2 p_v
 \]
 Split information è alto quando un attributo divide i dati in molte piccole porzioni. 
 Dividendo IG per lo split information, il gain ratio penalizza gli attributi che creano troppe partizioni.
