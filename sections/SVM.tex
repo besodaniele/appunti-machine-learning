@@ -1,0 +1,159 @@
+\chapter{Support vector machines}
+In un classificatore lineare dati dei dati di apprendimento $(x_i, y_i)$ con $x_i \in \mathbb{R}^d$ e $y_i \in \{-1, +1\}$ vogliamo apprendere un classificatore $f(x)$ tale che :
+\begin{equation*}
+	f(x) = \begin{cases}
+		+1 & \text{se } w \cdot x + b \geq 0 \\
+		-1 & \text{altrimenti}
+	\end{cases}
+\end{equation*}
+ovvero se la classificazione è corretta vale che $y_i f(x_i) > 0$.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{pictures/SVM/linearClassifier.png}
+	\caption{Esempio di classificatore lineare.}
+	\label{fig:linearClassifier}
+\end{figure}\noindent
+Un classificatore è della forma $f(x) = w^T x + b$, dove $w$ è il vettore dei pesi e $b$ è il bias. Nella forma bidimensionale il separatore è una retta.
+Nel caso tridimensionale il separatore è un piano. In un iperspazio di dimensione $d$ il separatore è un iperpiano di dimensione $d-1$.
+L'unica cosa necessaria a classificare i nuovi dati è conoscere $w$ e $b$.
+Nel percettrone se i dati sono linearmente separabili l'apprendimento converge, ma la convergenza può essere lenta e portare ad avere dei dati vicini al separatore.
+Vorremmo quindi aumentare il margine di separazione tra le due classi in modo da avere una generalizzazione migliore.
+\\
+Il \textbf{margine} è la distanza tra il separatore e il punto più vicino ad esso per ogni classe.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{pictures/SVM/margine.png}
+	\caption{Esempio di margine in un classificatore lineare.}
+	\label{fig:margin}
+\end{figure}\noindent
+Gli esempi più vicini al separatore sono chiamati \textbf{vettori di supporto} (support vectors).
+La distanza di un esempio $x_i$ dal separatore è data da:
+\begin{equation*}
+	r = \frac{|w^T \cdot x_i + b|}{||W||}
+\end{equation*}
+Il margine $\rho$ è quindi la distanza tra i vettori di supporto delle due classi.
+\section{Ottimizzazione del margine}
+Come possiamo migliorare il margine? La massimizzazione del margine è una buona idea per via della teoria della correttezza probabilmente approssimativa (PAC), dove un'ipotesi è considerata buona se è probabilmente corretta (con alta confidenza)
+e approssimativamente corretta (con bassa errore).
+Nella pratica gli unici fattori importanti sono i vettori di supporto, in quanto sono quelli che definiscono il margine.
+\\ \\
+Definiamo ora una support vector machine (SVM) lineare:
+\\
+Sia $\{(x_i, y_i)\}_{i=1,\dots,n},x_i\in\mathbb{R}^d,y_i\in\{-1,+1\}$ il training set separato da un iperpiano di margine $\rho$.
+\\
+Allora per ogni esempio $(x_i,y_i)$ vale che:
+\[
+\begin{aligned}
+w^T x_i + b &\le -\dfrac{\rho}{2} &&\text{se } y_i = -1,\\[4pt]
+w^T x_i + b &\ge  \dfrac{\rho}{2} &&\text{se } y_i = +1,
+\end{aligned}
+\qquad\Longleftrightarrow\qquad
+y_i\bigl(w^T x_i + b\bigr) \ge \dfrac{\rho}{2}.
+\]
+Per ogni vettore di supporto $x_s$ le disuguaglianze sopra sono soddisfatte come uguaglianze.
+Dopo aver riscalato $w$ e $b$ per $\rho = 2$, otteniamo la distanza tra ogni $x_s$ e l'iperpiano è:
+\begin{equation*}
+	r = \frac{y_s|w^T \cdot x_s + b|}{||W||} = \frac{1}{||W||}
+\end{equation*} 
+Allora il margine può essere espresso (riscalato) attraverso $w$ e $b$ come:
+\begin{equation*}
+	\rho = 2r = \frac{2}{||W||}
+\end{equation*}
+\subsection{Formulazione del problema}
+Allora ora possiamo formulare il problema di massimizzazione del margine:
+\\
+Trovare $w$ e $b$ tali che:
+\begin{itemize}
+	\item $\rho=\dfrac{2}{||W||}$ è massimizzato
+	\item per tutti i gli esempi di training vale che $y_i(w^T x_i + b) \ge 1$
+\end{itemize}
+Ma questo problema può essere riformulato come un problema di minimizzazione:
+\\
+Trovare $w$ e $b$ tali che:
+\begin{itemize}
+	\item $||W||^2 = W^T W$ è minimizzato
+	\item per tutti i gli esempi di training vale che $y_i(w^T x_i + b) \ge 1$
+\end{itemize}
+\subsection{Risoluzione del problema}
+Come possiamo risolvere questo problema di ottimizzazione vincolata?\\
+Vogliamo ottimizzare una funzione quadratica con vincoli lineari, quindi la soluzione lineare è univoca!\\
+Per risolvere il problema costruiamo il problema duale usando i moltiplicatori di Lagrange.
+Consideriamo un moltiplicatore di lagrange $\alpha_i$ per ogni vincolo $y_i(w^T x_i + b) \ge 1$ del problema originale.
+Allora vogliamo trovare $\alpha_1,\dots,\alpha_n$ tali che:ù
+\begin{itemize}
+	\item $Q(\alpha) = \sum_i a_i -\frac{1}{2}\sum_i \sum_j \alpha_i\alpha_j y_i y_j x_i^Tx_j \text{ è massimizzata}$
+	\item $\sum_i\alpha_iy_i=0$
+	\item $\alpha_i\geq 0, \forall \alpha_i$ 
+\end{itemize}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/SVM/ottimizzazione.png}
+	\caption{Ottimizzazione del margine.}
+	\label{fig:ottimizzazione}
+\end{figure}
+\section{Classificazione margine soft}
+Cosa succede se il dataset non è linearmente separabile?
+Introduco delle \textbf{variabili di slack $\xi_i$} per permettere le classificazioni errate di dati difficili o rumorosi, risultando in un margine "soft".
+
+\begin{tcolorbox}[colback=white,colframe=green!60!black,boxrule=1pt,arc=2mm,left=2mm,right=2mm]
+\textbf{Hard Margin SVM:}\\[2pt]
+Trova \(w\) e \(b\) tali che
+\[
+\begin{aligned}
+&w^Tw \text{ è minimizzato}\\[4pt]
+&\forall (x_i,y_i), i=1,\dots,n \quad y_i\bigl(w^\top x_i + b\bigr) \ge 1.
+\end{aligned}
+\]
+\end{tcolorbox}
+
+\vspace{6pt}
+
+\begin{tcolorbox}[colback=white,colframe=red!70!black,boxrule=1pt,arc=2mm,left=2mm,right=2mm]
+\textbf{Soft Margin SVM (con variabili di slack):}\\[2pt]
+Trova \(w\) e \(b\) tali che
+\[
+\begin{aligned}
+&w^Tw  + C\sum_{i=1}^n \xi_i,\\[4pt]
+&\forall (x_i,y_i), i=1,\dots,n \quad y_i\bigl(w^\top x_i + b\bigr) \ge 1-\xi_i, \quad \xi_i \ge 0.
+\end{aligned}
+\]
+\end{tcolorbox} \noindent
+Dove $C$ è un iperparametro di complessità che bilancia il trade-off tra massimizzare il margine e minimizzare l'errore di classificazione.
+\\
+Dunque il problema diventa:
+\[
+\min_{w\in \mathbb{R}^d, \xi_i \in \mathbb{R}^+} \quad ||w||^2 + C \sum_{i=1}^n \xi_i
+\]
+soggetto a:
+\[y_i(w^T x_i + b) \ge 1 - \xi_i, \forall i=1,\dots,n\]
+Ogni vincolo può essere soddisfatto se $\xi_i$ è sufficientemente grande.
+\\
+$C$ è un parametro di regolarizzazione tale che:
+\begin{itemize}
+	\item Se $C$ è piccolo permette ai vincoli di essere facilmente violati, dunque il margine è più ampio.
+	\item Se $C$ è grande i vincoli sono difficili da violare, dunque il margine è più stretto.
+	\item Se $C \to \infty$ si ritorna al caso di hard margin SVM.
+\end{itemize}
+Il problema rimane quadratico con vincoli lineari e quindi esiste un minimo assoluto unico.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/SVM/softmargin.png}
+	\caption{Esempio di soft margin SVM.}
+	\label{fig:softMargin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/SVM/softvshard.png}
+	\caption{Confronto tra hard e soft margin SVM.}
+	\label{fig:Cparameter}
+\end{figure}
+\section{SVM non lineari}
+Cosa succede se i dati non sono linearmente separabili?
+Possiamo mappare i dati in uno spazio di dimensione più alta dove sono linearmente separabili.
+Questa operazione può essere sempre essere effettuata tramite una funzione di mappatura $\phi(x)$.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/SVM/nonlinear.png}
+	\caption{Esempio di SVM non lineare.}
+	\label{fig:nonlinearSVM}
+\end{figure}\noindent
