@@ -17,7 +17,7 @@ Ogni $x\in X$ è un'istanza, ovvero un vettore di feature. I valori di $Y$ sono 
 Ogni funzione $g$ è un albero, dove $x$ viene classificato scendendo nell'albero fino alle foglie, dove gli viene assegnata una $y$.
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.8\textwidth]{pictures/decisionTree.png}
+	\includegraphics[width=0.8\textwidth]{pictures/decisionTrees/decisionTree.png}
 	\caption{Esempio di albero di decisione per la classificazione }
 \end{figure}
 Da notare che non tutti gli attributi necessariamente concorrono alla classificazione.
@@ -48,7 +48,7 @@ Gli alberi di decisione dividono lo spazio delle feature in iper rettangoli con 
 Ogni regione rettangolare viene etichettata con una classe (o una distribuzione di probabilità sulle classi).
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=\textwidth]{pictures/decisionBoundary.png}
+	\includegraphics[width=\textwidth]{pictures/decisionTrees/decisionBoundary.png}
 	\caption{Esempio di partizionamento dello spazio delle feature tramite un albero di decisione}
 \end{figure}
 Questo partizionamento è chiamato \textit{decision boundary}.
@@ -58,7 +58,7 @@ Trivialmente, esiste un albero di decisione consistente per ogni insieme di trai
 Un "buon" attributo separa gli esempi in sottoinsiemi che sono (idealmente) tutti negativi o tutti positivi.
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{pictures/separazioneDT.png}
+	\includegraphics[width=0.8\textwidth]{pictures/decisionTrees/separazioneDT.png}
 	\caption{Esempio di albero di decisione che rappresenta la funzione XOR}
 	\label{fig:DTsep}
 \end{figure} \noindent
@@ -90,7 +90,7 @@ L(y, g(x)) = \begin{cases}
 Qual è un problema con questa funzione di loss?
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.7\textwidth]{pictures/loss10.png}
+	\includegraphics[width=0.7\textwidth]{pictures/decisionTrees/loss10.png}
 	\caption{Funzione di loss 0-1}
 \end{figure}
 La funzione di loss 0-1 non è differenziabile, dunque non posso usare metodi basati sul calcolo del gradiente per minimizzarla.
@@ -102,7 +102,7 @@ R_{emp}(g) = \frac{1}{n} \sum_{i=1}^n (y_i - g(x_i))^2
 \]
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.6\textwidth]{pictures/MSE.png}
+	\includegraphics[width=0.6\textwidth]{pictures/decisionTrees/MSE.png}
 	\caption{Funzione di loss MSE}
 \end{figure}
 \subsection{Difficoltà nel training}
@@ -113,17 +113,17 @@ Inoltre, è possibile fermarsi a un albero parziale, senza arrivare alle foglie,
 Secondo il principio del \textbf{rasoio di Occam}, l'ipotesi più semplice che spiega i dati è da preferire.
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{pictures/overfitting.png}
+	\includegraphics[width=0.8\textwidth]{pictures/decisionTrees/overfitting.png}
 	\caption{Esempio di overfitting}
 \end{figure} 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{pictures/overfittingCorrelation.png}
+	\includegraphics[width=0.8\textwidth]{pictures/decisionTrees/overfittingCorrelation.png}
 	\caption{Errori in funzione della complessità del modello}
 \end{figure}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{pictures/overfittingTree.png}
+	\includegraphics[width=0.8\textwidth]{pictures/decisionTrees/overfittingTree.png}
 	\caption{Accuratezza in funzione della profondità dell'albero}
 \end{figure}
 \noindent
@@ -161,7 +161,7 @@ node := radice dell'albero di decisione\;
 Come determinare il "miglior" attributo su cui fare lo split?
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.6\textwidth]{pictures/split/split1.png}
+	\includegraphics[width=0.6\textwidth]{pictures/decisionTrees/split/split1.png}
 	\caption{Determinazione dell'attributo}
 \end{figure}
 L'idea di base è che un buon attributo separa bene gli esempi in sottoinsiemi che sono (idealmente) tutti negativi o tutti positivi.
@@ -192,7 +192,7 @@ Entropy(S) = -p_\oplus \log_2 p_\oplus - p_\ominus \log_2 p_\ominus
 \]
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.4\textwidth]{pictures/split/entropia.png}
+	\includegraphics[width=0.4\textwidth]{pictures/decisionTrees/split/entropia.png}
 	\caption{Valori di entropia in funzione della proporzione di esempi positivi}
 \end{figure}\noindent
 Una definizione alternativa dell'entropia ci dice che $Entropy(S)$ è la quantità media di informazione (in bit) necessaria per codificare la classe di un esempio scelto casualmente da $S$, in una codifica ottimale di lunghezza minima.
@@ -311,7 +311,7 @@ D14 & Rain     & Mild & High   & Strong & No  \\
 \end{table}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\textwidth]{pictures/split/humidityWind.png}
+	\includegraphics[width=0.6\textwidth]{pictures/decisionTrees/split/humidityWind.png}
 	\caption{Alberi di decisione basati su Humidity e Wind}
 \end{figure}
 Dunque possiamo concludere che Humidity è un attributo migliore di Wind per fare lo split, dato che riduce maggiormente l'entropia.

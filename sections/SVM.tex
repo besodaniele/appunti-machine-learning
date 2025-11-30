@@ -157,3 +157,42 @@ Questa operazione può essere sempre essere effettuata tramite una funzione di m
 	\caption{Esempio di SVM non lineare.}
 	\label{fig:nonlinearSVM}
 \end{figure}\noindent
+\subsection{Trucco del kernel}
+Una funzione kernel è equivalente al prodotto scalare in alcuni spazi delle feature.
+Ad esempio dato un vettore bidimensionale $x = [x_1, x_2]$, consideriamo la funzione $K(x_i, x_j) = (1 + x_i^T x_j)^2$.
+Possiamo mostrare che $K(x_i, x_j)=\phi(x_i)^T \phi(x_j)$ per una certa funzione di mappatura $\phi$.
+Scegliendo adeguatamente la funzione kernel possiamo evitare di calcolare esplicitamente la mappatura $\phi(x)$, portandoci in uno spazio di dimensione più alta senza dover calcolare le coordinate in tale spazio.
+\\
+Alcuni esempi di funzioni kernel sono:
+\begin{itemize}
+	\item Kernel lineare: $K(x_i, x_j) = x_i^T x_j$
+	\item Kernel polinomiale: $K(x_i, x_j) = (x_i^T x_j + 1)^d$ \\
+	Misura la similarità tra due vettori guardando quanto interagiscono attraverso una funzione polinomiale. Permette di modellare relazioni a curva (non lineari) tra le feature.
+	\item Kernel gausssiano (RBF): $K(x_i, x_j) = \exp\left(-\frac{||x_i - x_j||^2}{2\sigma^2}\right)$ \\
+	Funzione a campana che misura la similarità tra due vettori in base alla loro distanza euclidea.
+\end{itemize}
+\section{Classificazione multiclasse}
+Le SVM sono intrinsecamente dei classificatori binari. Per estenderle a problemi di classificazione multiclasse possiamo usare due approcci principali:
+\begin{itemize}
+	\item One-vs-All: Addestriamo una SVM per ogni classe, dove ogni SVM distingue una classe da tutte le altre.
+	\item Pairwise coupling: Addestriamo una SVM per ogni coppia di classi. Durante la predizione, ogni SVM vota per una classe e scegliamo la classe con il maggior numero di voti.
+\end{itemize}
+In figura \ref{fig:oneVSall} è mostrato un esempio di classificazione multiclasse con l'approccio one-vs-all.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/SVM/oneVSall1.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/SVM/oneVSall2.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/SVM/oneVSall3.png}
+	\caption{Esempio di classificazione multiclasse con SVM.}
+	\label{fig:oneVSall}
+\end{figure} \noindent
+Dato un esempio $d$ di test, come decidiamo il suo colore?
+Assegniamo a $d$ la classe della SVM che restituisce il valore più alto di $f(x)$.
+\\
+Il ragionamento è uguale per l'approccio pairwise coupling, ma in questo caso ogni vince la classe che ottiene più voti dalle SVM addestrate sulle coppie di classi.
