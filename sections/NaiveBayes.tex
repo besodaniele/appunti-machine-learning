@@ -1,0 +1,216 @@
+\chapter{Naive Bayes}
+I 3 modi per creare  un classificatore sono:
+\begin{itemize}
+	\item Modellare la regola di classificazione direttamente (es. Alberi decisionali, SVM, percettrone, ecc.).
+	\item Modellare la probabilità di appartenenza a una classe dato un esempio (percettrone con costo cross entropy)
+	\item Creare un modello probabilistico generativo per ogni classe e usare il teorema di Bayes per classificare.
+\end{itemize}
+I primi due sono detti \textbf{discriminativi}, l'ultimo \textbf{generativo}.
+Gli ultimi due approcci sono detti modelli di classificazione\textbf{probabilistica}.
+\section{Ripasso di probabilità}
+Definiamo la probabilità a priori, condizionata e congiunta per variabili aleatorie:
+\begin{itemize}
+	\item $P(X)$ è la probabilità a priori di X.
+	\item $P(X_1|X_2)$ è la probabilità condizionata di $X_1$ dato $X_2$.
+	\item $P(X_1,X_2)$ è la probabilità congiunta di $X_1$ e $X_2$.
+	\item Se $X_1$ e $X_2$ sono indipendenti, allora $P(X_1|X_2)=P(X_1)$ e $P(X_1,X_2)=P(X_1)P(X_2)$.
+\end{itemize}
+Il teorema di Bayes afferma che:
+\[P(X_1|X_2)=\frac{P(X_2|X_1)P(X_1)}{P(X_2)} \quad \rightarrow \quad \text{Posterior}=\frac{\text{Likelihood} \times \text{Prior}}{\text{Evidence}}
+\] 
+\section{Classificatore Bayesiano}
+L'apprendimento supervisionato può essere visto come una stima della probabilità condizionata $P(y|x)$, dove $y$ è la variabile di output (classe) e $x$ è il vettore delle feature.
+Immaginiamo di avere $k$ attributi su valori discreti, l'attributo di classe è $y$.
+\\
+Data un'istanza $x$ con valori degli attributi osservati $x_1,x_2,\dots,x_k$, l'obiettivo del modello è calcolare la probabilità a posteriori di ogni classe $y_i=c_j$ in modo da massimizzare:
+\[P(y=c|x_1,x_2,\dots,x_k)\]
+Dal teorema di Bayes:
+\[P(y=c|x_1,x_2,\dots,x_k)=\frac{P(x_1,x_2,\dots,x_k|y=c)P(y=c)}{P(x_1,x_2,\dots,x_k)}\]
+Notare che il denominatore è costante per tutte le classi, quindi possiamo ignorarlo nel processo di massimizzazione.
+Cosa rimane da calcolare è la probabilità congiunta $P(x_1,x_2,\dots,x_k|y=c)$, che può essere difficile da stimare a causa di due fattori:
+\begin{enumerate}
+	\item Dimensionalità della distribuzione: Se abbiamo $k$ variabili, stimare la distribuzione congiunta richiede di stimare tutte le dipendenze tra le variabili, questo richiede un numero di parametri esponenziale in $k$.
+	\item Distribuzione non nota: Non conosciamo a priori $P(x_1,x_2,\dots,x_k|y=c)$, quindi la sua forma. Senza un modello specifico la distribuzione non è stimabile in modo affidabile.
+\end{enumerate}
+\subsection{Assunzione di indipendenza}
+Per semplificare il problema, il classificatore Naive Bayes fa l'assunzione che tutte le feature siano condizionalmente indipendenti data la classe.
+Da notare che questa è un'assunzione forte e spesso non vera nel mondo reale, ma rende il calcolo della probabilità congiunta molto più semplice, per questo viene chiamato "naive" (ingenuo).
+Richiamiamo la regole di Bayes:
+\[P(y=c|x_1,x_2,\dots,x_k)=\frac{P(x_1,x_2,\dots,x_k|y=c)P(y=c)}{P(x_1,x_2,\dots,x_k)}\]
+Per la regola della catena, la probabilità congiunta può essere scomposta come:
+\[P(x_1,x_2,\dots,x_k|y=c)=P(x_1|y=c)P(x_2|x_1,y=c)P(x_3|x_1,x_2,y=c)\dots P(x_k|x_1,x_2,\dots,x_{k-1},y=c)\]
+Ma se assumiamo che le feature siano condizionalmente indipendenti data la classe, allora:
+\[P(x_i|x_1,x_2,\dots,x_{i-1},y=c)=P(x_i|y=c) \quad \text{per ogni } i\]
+Quindi la probabilità congiunta diventa:
+\[P(x_1,x_2,\dots,x_k|y=c)=\prod_{i=1}^{k}P(x_i|y=c)\]
+Sostituendo questa espressione nella formula di Bayes, otteniamo:
+\[P(y=c|x_1,x_2,\dots,x_k)=\frac{P(y=c)\prod_{i=1}^{k}P(x_i|y=c)}{P(x_1,x_2,\dots,x_k)}\]
+Poiché il denominatore è costante per tutte le classi, possiamo ignorarlo nel processo di massimizzazione.
+Dunque semplicemente calcoliamo:
+\[P(y=c|x_1,x_2,\dots,x_k)=P(y=c)\prod_{i=1}^{k}P(x_i|y=c) \]
+\section{Addestramento del classificatore}
+Per ogni possibile valore di classe che può assumere $y$, dobbiamo stimare le probabilità a priori $P(y=c)$ e le probabilità condizionate $P(x_i|y=c)$ per ogni feature $x_i$.
+Per addestrare il classificatore utilizziamo il metodo di \textbf{Maximum Likelihood Estimation} (MLE):
+Utilizzando unicamente i dati di addestramento cerca i parametri che massimizzano la probabilità del dataset osservato.\\
+Supponiamo di avere un modello statistico NP con parametri sconosciuti $\theta$ e dei dati osservati $X=\{x_1,x_2,\dots,x_n\}$.
+Il modello restituisce una distribuzione di probabilità $P(X|\theta)$, per la quale $\theta$ consiste nelle probabilità a priori e condizionate.
+Vogliamo stimare i parametri $\theta$.\\
+La funzione di verosimiglianza (likelihood) è definita come:
+\[L(\theta)=P(X|\theta)\]
+Se i dati sono indipendenti e identicamente distribuiti (i.i.d), la funzione di verosimiglianza può essere scritta come:
+\[L(\theta)=\prod_{i=1}^{n}P(x_i|\theta)\]
+Questa funzione misura quanto è compatibile il valore di $\theta$ con i dati osservati.
+Dato che il prodotto di probabilità è un numero molto piccolo, è più comodo lavorare con il logaritmo della funzione di verosimiglianza, chiamato log-verosimiglianza:
+\[\ell(\theta)=\log L(\theta)=\sum_{i=1}^{n}\log P(x_i|\theta)\]
+MLE cerca i parametri $\theta$ che massimizzano la verosomiglianza (o log-verosimiglianza):
+\[\hat{\theta}_{\text{MLE}}=\arg\max_{\theta} L(\theta)\]
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l l l l l}
+	\toprule
+	Day & Outlook & Temperature & Humidity & Wind & PlayTennis \\
+	\midrule
+	D1  & Sunny    & Hot  & High   & Weak   & No  \\
+	D2  & Sunny    & Hot  & High   & Strong & No  \\
+	D3  & \textcolor{red}{Overcast} & \textcolor{red}{Hot}  & \textcolor{red}{High}   & \textcolor{red}{Weak}   & \textcolor{red}{Yes} \\
+	D4  & \textcolor{red}{Rain}     & \textcolor{red}{Mild} & \textcolor{red}{High}   & \textcolor{red}{Weak}   & \textcolor{red}{Yes} \\
+	D5  & \textcolor{red}{Rain}     & \textcolor{red}{Cool} & \textcolor{red}{Normal} & \textcolor{red}{Weak}   & \textcolor{red}{Yes} \\
+	D6  & Rain     & Cool & Normal & Strong & No  \\
+	D7  & \textcolor{red}{Overcast} & \textcolor{red}{Cool} & \textcolor{red}{Normal} & \textcolor{red}{Weak}   & \textcolor{red}{Yes} \\
+	D8  & Sunny    & Mild & High   & Weak   & No  \\
+	D9  & \textcolor{red}{Sunny}    & \textcolor{red}{Cool} & \textcolor{red}{Normal} & \textcolor{red}{Weak}   & \textcolor{red}{Yes} \\
+	D10 & \textcolor{red}{Rain}     & \textcolor{red}{Mild} & \textcolor{red}{Normal} & \textcolor{red}{Weak}   & \textcolor{red}{Yes} \\
+	D11 & \textcolor{red}{Sunny}    & \textcolor{red}{Mild} & \textcolor{red}{Normal} & \textcolor{red}{Strong} & \textcolor{red}{Yes} \\
+	D12 & \textcolor{red}{Overcast} & \textcolor{red}{Mild} & \textcolor{red}{High}   & \textcolor{red}{Strong} & \textcolor{red}{Yes} \\
+	D13 & \textcolor{red}{Overcast} & \textcolor{red}{Hot}  & \textcolor{red}{Normal} & \textcolor{red}{Weak}   & \textcolor{red}{Yes} \\
+	D14 & Rain     & Mild & High   & Strong & No  \\
+	\bottomrule
+\end{tabular}
+\caption{PlayTennis: esempi di addestramento}
+\label{tab:playtennis-colored}
+\end{table}\noindent
+Consideriamo il dataset di addestramento in tabella \ref{tab:playtennis-colored}.
+Vale che $P(PlayTennis=Yes)=\frac{9}{14}$ e $P(PlayTennis=No)=\frac{5}{14}$.
+Per ogni variabile stimiamo le probabilità condizionate $P(x_i|PlayTennis=c)$.
+\begin{table}[H]
+\centering
+\small
+\begin{minipage}{0.48\textwidth}
+\centering
+\caption*{Outlook}
+\begin{tabular}{lcc}
+\toprule
+ & Play=Yes & Play=No \\
+\midrule
+Sunny    & $2/9$ & $3/5$ \\
+Overcast & $4/9$ & $0/5$ \\
+Rain     & $3/9$ & $2/5$ \\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\caption*{Temperature}
+\begin{tabular}{lcc}
+\toprule
+ & Play=Yes & Play=No \\
+\midrule
+Hot  & $2/9$ & $2/5$ \\
+Mild & $4/9$ & $2/5$ \\
+Cool & $3/9$ & $1/5$ \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+
+\vspace{6pt}
+
+\begin{minipage}{0.48\textwidth}
+\centering
+\caption*{Humidity}
+\begin{tabular}{lcc}
+\toprule
+ & Play=Yes & Play=No \\
+\midrule
+High   & $3/9$ & $4/5$ \\
+Normal & $6/9$ & $1/5$ \\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\caption*{Wind}
+\begin{tabular}{lcc}
+\toprule
+ & Play=Yes & Play=No \\
+\midrule
+Strong & $2/9$ & $3/5$ \\
+Weak   & $7/9$ & $2/5$ \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\caption{Probabilità condizionate stimate dagli esempi.}\label{tab:cond-probs-compact}
+\end{table}
+\section{Inferenza}
+Assegniamo a una istanza $x$ la classe $c^*$ che massimizza la probabilità a posteriori:
+\[P(y=c^*|x_1, x_2, \ldots, x_k)>P(y=c|x_1, x_2, \ldots, x_k) \quad \forall c \neq c^*, c\in C\]
+In pratica stimiamo la probabilità a posteriori per ogni classe $c\in C$ e scegliamo la classe con la probabilità più alta.
+Data una nuova istanza $x'=\{Sunny, Cool, High, Strong\}$, utilizziamo i parametri stimati nella tabella \ref{tab:cond-probs-compact} per calcolare le probabilità a posteriori:
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\begin{tcolorbox}[colback=gray!15,boxrule=0pt,arc=1mm,boxsep=3pt,left=2pt,right=2pt]
+\small
+\[
+\begin{aligned}
+&P(\text{Outlook}=\text{Sunny}\mid \text{Play}=\text{Yes}) = \tfrac{2}{9}\\[2pt]
+&P(\text{Temperature}=\text{Cool}\mid \text{Play}=\text{Yes}) = \tfrac{3}{9}\\[2pt]
+&P(\text{Humidity}=\text{High}\mid \text{Play}=\text{Yes}) = \tfrac{3}{9}\\[2pt]
+&P(\text{Wind}=\text{Strong}\mid \text{Play}=\text{Yes}) = \tfrac{3}{9}\\[2pt]
+&P(\text{Play}=\text{Yes}) = \tfrac{9}{14}
+\end{aligned}
+\]
+\end{tcolorbox}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+\begin{tcolorbox}[colback=gray!15,boxrule=0pt,arc=1mm,boxsep=3pt,left=2pt,right=2pt]
+\small
+\[
+\begin{aligned}
+&P(\text{Outlook}=\text{Sunny}\mid \text{Play}=\text{No}) = \tfrac{3}{5}\\[2pt]
+&P(\text{Temperature}=\text{Cool}\mid \text{Play}=\text{No}) = \tfrac{1}{5}\\[2pt]
+&P(\text{Humidity}=\text{High}\mid \text{Play}=\text{No}) = \tfrac{4}{5}\\[2pt]
+&P(\text{Wind}=\text{Strong}\mid \text{Play}=\text{No}) = \tfrac{3}{5}\\[2pt]
+&P(\text{Play}=\text{No}) = \tfrac{5}{14}
+\end{aligned}
+\]
+\end{tcolorbox}
+\end{minipage}
+\end{center}
+Per assegnare la classe usiamo la regole MAP (Maximum A Posteriori):
+\[
+\begin{aligned}
+	P(Yes|x’):& [P(Sunny|Yes)P(Cool|Yes)P(High|Yes)P(Strong|Yes)]P(Play=Yes) = 0.0053 \\ 
+	P(No|x’):& [P(Sunny|No) P(Cool|No)P(High|No)P(Strong|No)]P(Play=No) = 0.0206
+\end{aligned}
+\]
+Poiché $P(No|x’)>P(Yes|x’)$, assegniamo la classe \textbf{No} all'istanza $x'$.
+\section{Problemi di naive Bayes}
+\subsection*{Zero counts}
+Se un degli attributi ha una combinazione di valori che non appare nel dataset di addestramento per una certa classe, la probabilità condizionata stimata sarà zero.
+Questo porterà a una probabilità a posteriori di zero per quella classe, indipendentemente dalle altre feature.
+Per risolvere questo problema si usa la tecnica di smoothing.
+\[
+P(x_i|y=c)=\frac{n_{ij}+\lambda}{n_i+\lambda m_i}
+\]
+Dove:
+\begin{itemize}
+	\item $n_i$ è il numero totale di istanze nella classe $c$.
+	\item $n_{ij}$ è il numero di istanze nella classe $c$ con il valore $x_i$.
+	\item $m_i$ è il numero di possibili valori che $x_i$ può assumere.
+	\item $\lambda$ è un parametro di smoothing (tipicamente $\lambda=1$).
+\end{itemize}
+In generale con attraverso l'uso di $\lambda$ introduciamo $\lambda -1$ esempi fittizi per ogni categoria.
+\subsection*{Attributi numerici}
+L'apprendimento bayesiano assume che tutte le feature siano categoriche. Per poter trattare gli attributi numerici è necessario discretizzarli, oppure usare una distribuzione continua.
+Nel secondo caso, una comune assunzione è che gli attributi numerici seguano una distribuzione gaussiana (normale) all'interno di ogni classe.
+
