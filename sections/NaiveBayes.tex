@@ -196,7 +196,7 @@ Per assegnare la classe usiamo la regole MAP (Maximum A Posteriori):
 Poiché $P(No|x’)>P(Yes|x’)$, assegniamo la classe \textbf{No} all'istanza $x'$.
 \section{Problemi di naive Bayes}
 \subsection*{Zero counts}
-Se un degli attributi ha una combinazione di valori che non appare nel dataset di addestramento per una certa classe, la probabilità condizionata stimata sarà zero.
+Se uno degli attributi ha una combinazione di valori che non appare nel dataset di addestramento per una certa classe, la probabilità condizionata stimata sarà zero.
 Questo porterà a una probabilità a posteriori di zero per quella classe, indipendentemente dalle altre feature.
 Per risolvere questo problema si usa la tecnica di smoothing.
 \[
