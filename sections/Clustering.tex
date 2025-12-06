@@ -1,0 +1,276 @@
+\chapter{Clustering}
+Cominciamo ponendo la differenza tra clustering e classificazione.
+\begin{itemize}
+	\item \textbf{Classificazione}: 
+	\begin{itemize}
+		\item Le istanze hanno un'etichetta di classe target nota.
+		\item Viene determinata una funzione che assegna in modo accurato le etichette agli esempi non noti.
+		\item Apprendimento supervisionato.
+	\end{itemize}
+	\item \textbf{Clustering}:
+	\begin{itemize}
+		\item Non ci sono etichette
+		\item I punti vengono raggruppati in base alla loro somiglianza (o alla distanza).
+		\item Identifica delle strutture nei dati.
+		\item Apprendimento non supervisionato.
+	\end{itemize}
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pictures/Clustering/classVSclust.png}
+	\caption{Differenza tra clustering e classificazione}
+\end{figure}
+Il ruolo del clustering è dunque quello di scoprire delle strutture nascoste nei dati, raggruppando gli oggetti simili tra loro in cluster.
+\\
+Un problema di clustering può essere visto come una classificazione non supervisionata.
+Applicare questa tecnica è corretto se non si ha conoscenza pregressa sui dati.
+Tipicamente viene impiegato come metodo di analisi per verificare ipotesi intuitive sulla distribuzione dei dati, oppure per scoprire pattern.
+\\
+\\
+Ora cerchiamo di dare una definizione formale di \textbf{cluster}:
+\begin{itemize}
+	\item Un cluster è un insieme di oggetti che sono simili tra loro e dissimili dagli oggetti appartenenti ad altri cluster.
+	\item Un cluster è un'aggregazione di punti nello spazio di test tale che la distanza tra ognuno dei due punti in esso è minore della distanza tra punti del cluster e quelli esterni.
+	\item Un cluster è una regione contigua nello spazio (n-dimensionale delle feature), contenente una relativamente alta densità di punti, separata da altre regioni di quel tipo da regioni a bassa densità.
+\end{itemize}
+Ognuna di queste definizioni cattura aspetti diversi e complementari del concetto di cluster.
+\\
+La prima definizione è puramente concettuale, enfatizza la similarità, gli oggetti in un cluster si devono assomigliare e quelli in cluster diversi devono essere dissimili.
+Questa definizione cattura il concetto intuitivo del clustering senza però però fornire una definizione di somiglianza.
+\\La seconda definizione è basata sulla distanza, descrivendo i cluster in termini di separazione geometrica.
+Formalizza l'idea che i punti in cluster siano più vicini tra loro rispetto a quelli in cluster diversi, questa definizione è allineata con il funzionamento di algoritmi basati sulla distanza come k-means.
+\\
+Infine, la terza è basata sulla densità, considera i cluster come regioni dense in uno spazio n-dimensionale, separate da regioni meno dense. 
+\\
+\\
+In generale, gli obiettivi di un algoritmo di clustering sono:
+\begin{itemize}
+	\item Massimizzare la similarità intra-cluster: i punti all'interno di un cluster dovrebbero essere compatti e coerenti, ovvero devono essere simili.
+	\item Minimizzare la similarità inter-cluster: cluster diversi devono rappresentare gruppi distinti o pattern diversi nei dati, quindi i punti in cluster diversi devono essere il più dissimili possibile.
+\end{itemize}
+Il clustering può essere visto come un processo di ottimizzazione in cui si cerca di trovare la migliore partizione dei dati che soddisfi questi obiettivi.
+Come variabili del problema consideriamo se un oggetto appartiene o meno a un cluster specifico, come funzione da massimizzare possiamo usare la intra-similarità.
+Poniamo il vincolo che ogni oggetto deve appartenere a solo un cluster.
+\paragraph{Problema}
+\begin{itemize}
+  \item \textbf{Problema}: dati $m$ punti $\{x_1,\dots,x_m\}$ in $\mathbb{R}^n$ e un intero fissato $k$ di cluster, determinare $k$ ``centri'' $\{c_1,\dots,c_k\}$ in $\mathbb{R}^n$ tali che la somma delle \emph{distanze} di ogni punto dal centro di cluster più vicino sia minimizzata.
+\end{itemize}\[
+\min_{c^1,\dots,c^k}\;\sum_{i=1}^m \min_{\ell=1,\dots,k} \bigl\|x^i - c^\ell\bigr\|.
+\tag{1}
+\]
+\paragraph{versione semplificata}
+\begin{align}
+\text{minimizza}\quad & \sum_{i=1}^m \sum_{\ell=1}^k t_{i\ell}\,\bigl\|x^i - c^\ell\bigr\| \tag{2}\\
+\text{soggetto a}\quad &
+\sum_{\ell=1}^k t_{i\ell} = 1,\qquad
+t_{i\ell} \ge 0,\quad i=1,\dots,m,\ \ell=1,\dots,k. \tag{3}
+\end{align}
+\paragraph{Algoritmi}
+\begin{itemize}
+  \item \textbf{Esatti} (per problemi ``piccoli''): Simplesso, Branch and Bound, \dots
+  \item \textbf{Euristici} (per problemi ``grandi''): K-Means, K-Medians, \dots
+\end{itemize}
+Nella formula (1) consideriamo una norma arbitraria in $\mathbb{R}^n$ e definiamo una funzione di costo.
+Da notare che la funzione obiettivo è la somma dei minimi di un insieme di funzioni convesse, che in generale non è ne convessa che concava, quindi è un problema difficile.
+Possiamo semplificare il problema introducendo delle variabili binarie $t_{i\ell}$ che indicano se il punto $x^i$ appartiene al cluster con centro $c^\ell$.
+Se ci sono più centri con distanza minima da $x$, allora i valori $t_{i\ell}$ corrispondenti a quei centri possono essere posti a un valore non nullo, formando una combinazione convessa della distanza minima.
+\\
+\\
+Si noti che il clustering dipende fortemente dalla metrica tramite la quale viene misurata la distanza tra i punti o la loro similarità.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Clustering/pipeline.png}
+	\caption{Pipeline del processo di clustering}
+\end{figure}
+\section{Misure di similarità e distanza}
+I cluster sono considerati come gruppi di dati simili tra loro, come decidiamo la loro similarità?
+Possiamo rappresentare queste misure attraverso dei numeri finiti.
+La similarità tra oggetti può essere difficile da definire formalmente, ma al livello può essere intuitivo (infatti vanno effettuate analisi dopo aver effettuato il clustering).
+\\
+\\
+La dissimilarità (o distanza) è una funzione su un dataset $X$ simmetrica e non negativa, inoltre se vale la disuguaglianza triangolare ed è riflessiva, allora è una \textbf{metrica}.
+\subsection{Clustering su variabili continue}
+Ora presentiamo alcune misure di distanza e similarità comunemente usate nel clustering per variabili continue.
+\begin{itemize}
+	\item \textbf{distanza euclidea} (definita come la norma 2):
+		\[d(x,y) = \|x-y\|_2 = \sqrt{\sum_{i=1}^d (x_i - y_i)^2}.\]
+		Questa misura tende a formare cluster di forma sferica.
+		Notare inoltre che la distanza euclidea è sensibile sia alla direzione che alla scala delle feature, quindi alla struttura geometrica dei dati.
+	\item \textbf{Similarità coseno}:
+		\[s(x,y) = \cos\alpha\frac{x^Ty}{||x||||y||}\]
+		Prende valori nell'intervallo $[-1,1]$, dove 1 indica vettori identici, 0 vettori ortogonali e -1 vettori opposti.
+		Questa misura tiene conto unicamente dell'angolo tra i vettori, ignorando la loro magnitudine.
+		Partendo da questa misura di similarità, possiamo definire una distanza come:
+		\[d(x,y) = 1 - s(x,y).\]
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/Clustering/eucDistCosSim.png}
+	\caption{Esempi di distanza euclidea e similarità coseno}
+\end{figure}
+\subsection{Clustering su variabili binarie}
+Una misura comune di similarità per variabili binarie è la distanza di Jaccard.
+\[
+	J= 1 - \frac{|A \cap B|}{|A \cup B|}
+\]
+Dove $A$ e $B$ sono due insiemi di attributi binari. $J$ assume valori tra 0 e 1, dove 0 indica che i due insiemi non si sovrappongono e 1 indica che sono identici.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{pictures/Clustering/jaccard.png}
+	\caption{Distanza di Jaccard}
+\end{figure}
+\subsection{Clustering su variabili ordinali}
+Possiamo trattare finalmente le relazioni di ordine tra le variabili.
+I possibili valori assumibili vanno da $1$ a $M_j$ dove $M_j$ è il numero di livelli di priorità della feature $j$.
+Più sono vicini i livelli di due feature, più sono simili i due oggetti.
+Dato che il numero di livelli può variare tra le feature, è opportuno normalizzare i valori:
+\[x^*_{ij} =  \frac{x_{ij} - 1}{M_j - 1}\]
+\section{Algoritmi di clustering}
+Generalmente, gli algoritmi di clustering possono essere classificati in diverse categorie in base al loro approccio e alla metodologia utilizzata per raggruppare i dati.
+\begin{itemize}
+    \item \textbf{Algoritmi di partizionamento}: questi metodi dividono direttamente il dataset in un numero fisso di cluster, senza costruire alcuna relazione gerarchica.
+    
+    \item \textbf{Algoritmi gerarchici}: questi algoritmi creano una gerarchia di cluster annidati, sia attraverso la fusione progressiva di singoli punti (agglomerativo) sia attraverso la divisione di un cluster grande in cluster più piccoli (divisivo).
+    
+    \item \textbf{Metodi basati sulla densità}: questi approcci identificano i cluster come regioni dense nello spazio delle feature, separate da aree a bassa densità.
+    
+    \item \textbf{Metodi basati su griglia}: il clustering viene eseguito dividendo lo spazio dei dati in una struttura a griglia e analizzando i dati a diversi livelli di granularità.
+    
+    \item \textbf{Metodi basati su modello}: questi metodi assumono un modello statistico o matematico per i dati e tentano di adattare i cluster in base a quella struttura di modello.
+\end{itemize}
+Noi ci focalizzeremo sugli algoritmi di partizionamento, in particolare sul k-means (con alcune varianti).\\
+Il clustering di partizionamento divide un dataset in esattamente $K$ cluster, con ogni istanza assegnata a uno e uno solo cluster. L'approccio si basa sull'ottimizzazione di una funzione di costo (o criterio), come la distanza intra-cluster in K-means, al fine di produrre il raggruppamento più coerente.
+Sebbene la soluzione ottimale potrebbe, in teoria, essere trovata valutando esaustivamente tutti i possibili modi di assegnare i punti a $K$ cluster, ciò è computazionalmente non fattibile per qualsiasi dataset realistico, poiché il numero di possibili partizioni cresce esponenzialmente.
+Di conseguenza, gli algoritmi pratici di clustering di partizionamento utilizzano euristiche o raffinamenti iterativi per approssimare una buona soluzione piuttosto che garantire l'ottimo globale.
+Questi algoritmi partono da un assegnamento iniziale dei punti ai cluster (spesso casuale), che viene man mano raffinato per migliorare la funzione obiettivo.
+Nonostante questi algoritmi non garantiscano di trovare la soluzione ottimale, sono spesso in grado di produrre risultati buoni in pratica.
+\\
+\\
+Il criterio più comunemente utilizzato è quello di minimizzare la sommare degli errori quadratici (SSE, \textbf{Sum of Squared Errors}).
+Supponiamo di avere un insieme di oggetti $x_i \in \mathbb{R}^d, i=1,\dots,m$ e di volerli partizionare in $k$ cluster.
+Allora la SSE è definita come:
+\[J_S(\Gamma, M) = \sum_{i=1}^k \sum_{j=1}^{N} ||x_j - m_i||^2\]
+Dove $\Gamma$ è la matrice di partizione ($\gamma_{ij} = 1$ se l'oggetto $x_j$ appartiene al cluster $i$, 0 altrimenti), $M$ sono i centroidi dei cluster (i centri).
+La SSE misura quanto i punti all'interno di ogni cluster sono vicini al centro del cluster. Vogliamo trovare un assegnamento dei punti ai cluster e i centri che minimizzano questa somma.
+Un \textbf{centroide} di un cluster è il punto medio (media aritmetica) di tutti i punti appartenenti a quel cluster.
+Formalmente, il centroide $m_i$ del cluster $C_i$ con $n$ punti è dato da:
+\[m_i = \frac{1}{n} \sum_{x_j \in C_i} x_j\]
+La minimizzazione della SSE tende a produrre cluster compatti e ben separati, questo ragionamento è alla base dell'efficacia del k-means.
+\section{K-means}
+Mostriamo ora i passaggi dell'algoritmo k-means:
+\begin{enumerate}
+	\item Scegliere il numero di cluster $k$.
+	\item Inizializzare i centroidi dei cluster, selezionando casualmente $k$ punti dal dataset come centroidi iniziali.
+	\item Assegnare ogni punto al cluster il cui centroide è più vicino, basandosi su una misura di distanza (tipicamente la distanza euclidea).
+	\item Aggiornare i centroidi calcolando la media dei punti assegnati a ciascun cluster.
+	\item Controllare la condizione di convergenza, ovvero i punti vengono assegnati agli stessi cluster a cui appartenevano nell'iterazione precedente, altrimenti tornare al passo 3.
+\end{enumerate}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pictures/Clustering/kmeans.png}
+	\caption{Esempio di esecuzione dell'algoritmo k-means}
+\end{figure}
+Avendo $k$ cluster e $n$ punti $d$-dimensionali, la complessità computazionale di ogni iterazione dell'algoritmo k-means è $O(nkd)$.
+A ogni iterazione dobbiamo confrontare ogni feature di ogni punto con quelle dei centroidi per assegnarlo al cluster più vicino, il che richiede $O(nkd)$ operazioni.
+Dunque la complessità totale è $O(inkd)$, dove $i$ è il numero di iterazioni fino alla convergenza.
+Nonostante in teoria il numero di iterazioni possa essere elevato, in pratica l'algoritmo tende a convergere in poche iterazioni per la maggior parte dei dataset.
+\subsection{Limitazioni di k-means}
+Il K-means assume che i cluster siano di forma sferica, di dimensioni e densità simili.
+Questo può portare a risultati inaccurati quando i cluster hanno forme complesse, dimensioni o densità diverse.
+\subsubsection{Dimensioni diverse}
+Se un cluster è più grande e sparso, mentre un altro è più piccolo e denso, il k-means tenterà di forzarli ad avere dei gruppi di grandezza simile, perché la funzione obiettivo da minimizzare è la distanza intra-cluster
+non tiene conto della densità del cluster. Di conseguenza:
+\begin{itemize}
+	\item Cluster grandi possono essere suddivisi in più cluster.
+	\item Cluster piccoli possono essere assorbiti da cluster più grandi.
+	\item I centroidi possono essere spostati verso cluster più grandi.
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Clustering/probDim.png}
+	\caption{Limitazioni di k-means con cluster di diversa dimensione}
+\end{figure}
+\subsubsection{Densità diverse}
+K-means assume che tutti i cluster abbiano una densità simile, ovvero una diffusione o varianza simile attorno ai loro centroidi.
+Quando i cluster hanno densità diverse, K-means produce risultati scarsi perché la sua funzione obiettivo attrae i centroidi verso le regioni con maggiore concentrazione di punti.
+Di conseguenza:
+\begin{itemize}
+    \item I cluster densi possono essere suddivisi in diversi cluster più piccoli.
+    \item I cluster sparsi possono essere forzati a fondersi con cluster più densi.
+    \item K-means può posizionare i centroidi in posizioni che non riflettono la vera struttura dei cluster.
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Clustering/probDens.png}
+	\caption{Limitazioni di k-means con cluster di diversa densità}
+\end{figure}
+\subsubsection{Forme non sferiche}
+K-means assume intrinsecamente che i cluster siano sferici perché partiziona lo spazio assegnando ogni punto al centroide più vicino in base alla distanza euclidea. Questo funziona solo quando i cluster sono compatti e ``a forma di palla''.
+Quando i cluster hanno forme non sferiche, come negli esempi in letteratura, K-means non riesce a catturare i loro veri confini. Invece, li suddivide in più gruppi sferici artificiali.
+Questa limitazione si verifica per due motivi principali:
+\begin{itemize}
+    \item \textbf{I centroidi non possono rappresentare forme complesse}: un centroide sintetizza un cluster con un singolo punto e non può catturare la geometria, la curvatura o la struttura di un cluster con forma complessa.
+    \item \textbf{La distanza euclidea crea regioni sempre convesse}: per due punti qualsiasi all'interno del cluster, il segmento di retta che li connette giace anch'esso all'interno del cluster.
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Clustering/probShape.png}
+	\caption{Limitazioni di k-means con cluster di forma non sferica}
+\end{figure}\noindent
+Ricapitolando, i vantaggi e svantaggi di k-means sono:
+\begin{itemize}
+	\item \textbf{Vantaggi}:
+	\begin{itemize}
+		\item Funzione bene in molte situazioni pratiche, in particolare quando i cluster sono sferici e di dimensioni simili.
+		\item Semplice da implementare.
+		\item Computazionalmente efficiente, con complessità lineare rispetto al numero di punti, cluster e dimensioni.
+	\end{itemize}
+	\item \textbf{Svantaggi}:
+	\begin{itemize}
+		\item Può convergere a minimi locali, portando a risultati lontani dell'ottimo globale.
+		\item Sensibile all'iniziazione dei centroidi.
+		\item Fortemente dipendente dalla scelta di $k$.
+	\end{itemize}
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pictures/Clustering/initCentroid.png}
+	\caption{Risultati diversi a seconda dell'inizializzazione dei centroidi}
+\end{figure}
+\section{Appendice: varianti di K-means}
+Presentiamo ora alcune varianti dell'algoritmo k-means che rispondono ad alcune delle sue limitazioni.
+\subsection{K-medoids}
+Il K-means è sensibile agli outlier perché utilizza la media per calcolare i centroidi, che può essere influenzata da valori estremi.
+Il K-medoids affronta questo problema utilizzando i medoid invece dei centroidi, ovvero elementi realmente presenti nel dataset.
+I passaggi dell'algoritmo K-medoids sono:
+\begin{enumerate}
+	\item Scegliere il numero di cluster $k$.
+	\item Assegnare ogni punto al cluster più vicino, basandosi su una misura di distanza del rappresentante del cluster.
+	\item Selezionare casualmente un punto non rappresentativo $x_i$
+	\item Calcolare il costo totale $S$ di scambiare il rappresentante del cluster con $x_i$.
+	\item Se $S$ è negativo, effettuare lo scambio e aggiornare il rappresentante del cluster. 
+	\item Controllare la condizione di convergenza, ovvero i punti vengono assegnati agli stessi cluster a cui appartenevano nell'iterazione precedente, altrimenti tornare al passo 2.
+\end{enumerate}
+Immaginiamo di scambiare un medoid corrente \(m\) con un non-medoid \(x\).
+La variazione totale di costo \(S\) è data da:
+\[
+S = cost_{after} - cost_{before}
+\]
+\begin{itemize}
+  \item \textbf{Costo prima dello scambio}: somma delle distanze di ogni punto dal proprio medoid più vicino nell’insieme corrente.
+  \item \textbf{Costo dopo lo scambio}: somma delle distanze di ogni punto dal proprio medoid più vicino nel nuovo insieme in cui \(m\) è sostituito da \(x\).
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Clustering/medoid.png}
+	\caption{Esempio di esecuzione dell'algoritmo k-medoids}
+\end{figure}
+\subsection{K-medians}
+Il K-medians è simile al K-means, ma utilizza la mediana invece della media per calcolare i centroidi dei cluster.
+Tipicamente la distanza viene calcolata usando la norma 1 (distanza di Manhattan). La mediana è meno sensibile agli outlier rispetto alla media.
+\subsection{K-modes}
+Il K-modes è una variante del K-means progettata per il clustering di dati categorici.
+Questo serve perché K-means \textbf{\underline{non può lavorare con dati categorici}}, in quanto la media di valori categorici non ha senso.
+In questo algoritmo i centroidi vengono calcolati utilizzando la moda (il valore più frequente) per ogni attributo categorico.
+La distanza viene calcolata usando una metrica basata sul conteggio delle differenze tra le categorie degli attributi.
