@@ -1,0 +1,163 @@
+\chapter{Metriche di valutazione}
+In questo capitolo vengono descritte le principali metriche utilizzate per valutare le prestazioni di modelli di machine learning.
+Una metrica che verrebbe naturale da utilizzare, ma che non è un buon indicatore, è l'errore sui dati di training, in quanto la distribuzione dei dati reali potrebbe non essere necessariamente identica a quella dei dati di training.
+Possono avvenire due casi:
+\begin{itemize}
+	\item \textbf{Overfitting}: il modello si adatta troppo ai dati di training, perdendo la capacità di generalizzare a dati nuovi $\rightarrow$ alto costo computazionale.
+	\item \textbf{Underfitting}: il modello non viene addestrato accuratamente e ha scarse prestazioni su dati nuovi $\rightarrow$ basso costo computazionale.
+\end{itemize}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Metriche/fitting.png}
+	\caption{Errori al variare della complessità del modello}
+	\label{fig:overfitting_underfitting}
+\end{figure}
+\section{Misure di prestazioni}
+Vedremo ora alcune metriche più appropriate per valutare le prestazioni di un modello.
+In generale due misure delle prestazioni sono:
+\begin{itemize}
+	\item \textbf{Accuratezza (Accuracy)}: percentuale di predizioni corrette sul totale delle istanze.
+	\item \textbf{Errore (Error Rate)}: percentuale di predizioni errate sul totale delle istanze.
+\end{itemize}
+Rappresentando le predizioni in una matrice di confusione, possiamo avere una visione più chiara delle prestazioni del modello.
+\[
+\begin{array}{c|cc}
+ & \text{Pred. Pos} & \text{Pred. Neg} \\
+\hline
+\text{Actual Pos} & \text{TP} & \text{FN} \\
+\text{Actual Neg} & \text{FP} & \text{TN}
+\end{array}
+\]
+Tendenzialmente i modelli cercano di minimizzare $FP+FN$.
+In pratica, a seconda del contesto, può essere più importante minimizzare uno dei due tipi di errore.
+Ad esempio, in un sistema di diagnosi medica, un falso negativo (FN) potrebbe essere più critico di un falso positivo (FP).
+In un problema multiclasse, la matrice di confusione si estende a più righe e colonne, rappresentando le predizioni e le etichette reali per ciascuna classe.
+\\
+Vediamo ora come calcolare le metriche rispetto alla matrice di confusione:
+\begin{itemize}
+	\item \textbf{Accuratezza (Accuracy)}: misura la proporzione di predizioni corrette sul totale delle istanze.
+	\[
+	\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+	\]
+	\item \textbf{Precisione (Precision)}: misura la proporzione di predizioni positive corrette rispetto al totale delle predizioni positive.
+	\[
+	\text{Precision} = \frac{TP}{TP + FP}
+	\]
+	\item \textbf{Richiamo (Recall)}: misura la proporzione di istanze positive correttamente identificate rispetto al totale delle istanze positive.
+	\[
+	\text{Recall} = \frac{TP}{TP + FN}
+	\]
+	\item \textbf{F-measure}: è la media armonica tra precisione e richiamo, utile quando si vuole bilanciare entrambi gli aspetti.
+	\[
+	\text{F-measure} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+	\]
+\end{itemize}
+Se estendiamo al caso multiclasse:
+\begin{itemize}
+	\item Precision: $\text{Precision}(l) = \frac{\text{\# istanze correttamente classificate come } l}{\text{\# istanze classificate come } l}$
+	\item Recall: $\text{Recall}(l) = \frac{\text{\# istanze correttamente classificate come } l}{\text{\# istanze effettivamente appartenenti a } l}$
+	\item F-measure: $\text{F-measure}(l) = 2 \cdot \frac{\text{Precision}(l) \cdot \text{Recall}(l)}{\text{Precision}(l) + \text{Recall}(l)}$
+\end{itemize}
+Data una label $l\in L$ (possibili etichette), possiamo calcolare per ogni metrica le seguenti medie:
+\begin{itemize}
+	\item \textbf{Macro-averaged}: Tutte le classi hanno lo stesso peso.
+	\[\text{Perf}^* = \frac{1}{|L|} \sum_{l \in L} \text{Perf}(l)\]
+	\item \textbf{Micro-averaged}: Le classi più grandi hanno più peso.
+	\[\text{Perf}^* = \sum_{l \in L} \frac{|\text{ class(l)|}}{\text{tot. istanze}} \text{Perf}(l)\]
+\end{itemize}
+\subsection{Curva ROC e AUC}
+La curva ROC (Receiver Operating Characteristic) è uno strumento grafico utilizzato per valutare le prestazioni di un classificatore binario al variare della soglia di decisione.
+La curva ROC traccia il tasso di veri positivi (TPR) contro il tasso di falsi positivi (FPR) per diverse soglie di classificazione.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/Metriche/ROC.png}
+	\caption{Curva ROC}
+	\label{fig:roc_curve}
+\end{figure}
+Cosa significa il threshold?
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Metriche/threshold.png}
+	\caption{Esempio di thresholding}
+	\label{fig:threshold_example}
+\end{figure}
+Cosa succede cambiando il threshold?
+\begin{itemize}
+	\item Soglia alta: Il modello è più conservativo nel classificare le istanze come positive $\rightarrow$ aumentiamo la precisione ma diminuiamo il recall.
+	\item Soglia bassa: Il modello è più permissivo nel classificare le istanze come positive $\rightarrow$ aumentiamo il recall ma diminuiamo la precisione.
+\end{itemize}
+L'\textbf{Area Under the Curve (AUC)} è una misura numerica che quantifica la performance complessiva del classificatore rappresentato dalla curva ROC.
+Quando serve?
+\begin{itemize}
+	\item Durante l'addestramento permette di confrontare diversi modelli tra di loro.
+	\item Sia durante l'addestramento che in produzione, permette di valutare le prestazioni del modello indipendentemente dalla soglia scelta con una singola metrica.
+\end{itemize}
+Ci sono delle limitazioni nell'uso dell'AUC:
+\begin{itemize}
+	\item Non considera i costi associati ai falsi positivi e ai falsi negativi. Quindi in situazioni in cui vogliamo ottimizzare per uno specifico tipo di errore, l'AUC potrebbe non essere la metrica più adatta. 
+	\item In presenza di classi sbilanciate, l'AUC potrebbe non riflettere accuratamente le prestazioni del modello.
+\end{itemize}
+\section{Learning curve}
+Le learning curve sono grafici che mostrano l'andamento delle prestazioni di un modello in funzione della quantità di dati di addestramento utilizzati.
+È quindi necessario avere uno schedule di training che preveda l'addestramento del modello su sottoinsiemi crescenti di dati.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/Metriche/learning_curve.png}
+	\caption{Esempio di learning curve}
+	\label{fig:learning_curve}
+\end{figure}
+In generale con campioni piccoli si tende ad avere un'alta varianza e bias.
+\section{Valutazioni su dataset grandi}
+Quando abbiamo tanti esempi a disposizione, con molte istanze di ogni classe, possiamo semplicemente suddividere il dataset in due parti:
+\begin{itemize}
+	\item \textbf{Training set}: usato per addestrare il modello.
+	\item \textbf{Test set}: usato per valutare le prestazioni del modello.
+\end{itemize}
+Una suddivisione comune è 70\% per il training set e 30\% per il test set.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{pictures/Metriche/pipeline.png}
+	\caption{Processo di training e testing}
+	\label{fig:train_test_split}
+\end{figure} \noindent
+In generale, con set di training più grandi si ottengono classificatori migliori, con set di test più grandi si ottengono stime di errori più accurate.
+È importante che il test set non venga mai utilizzato durante l'addestramento del modello, per evitare il rischio di overfitting.
+Inoltre non si può utilizzare il test set per il raffinamento dei parametri.
+La procedura corretta è utilizzare tre set distinti: training, validation e test.
+Dove il validation set viene usato per il tuning dei parametri.
+\section{Valutazioni su dataset piccoli}
+Se il dataset è piccolo la divisione $70\%-30\%$ potrebbe non essere rappresentativa della distribuzione reale dei dati.
+La soluzione è effettuare più volte il training su sottoinsiemi \underline{disgiunti} del dataset e calcolare la media delle prestazioni.
+\subsection{Cross validation}
+La cross validation è una tecnica che previene l'overlap tra set di test scelti nelle iterazioni.
+Il procedimento della \textbf{k-fold cross validation} è il seguente:
+\begin{itemize}
+	\item Si suddivide il dataset in $k$ sottoinsiemi (fold) di dimensioni approssimativamente uguali.
+	\item Ogni sottoinsieme viene utilizzato a turno come test set, mentre gli altri $k-1$ sottoinsiemi vengono combinati per formare il training set.
+\end{itemize}
+Tendenzialmente i fold vengono scelti prima di effetturare la cross validation, in modo che la distribuzione delle classi in ogni fold sia simile a quella del dataset originale (\textbf{stratificazione}).
+Le stime degli errori vengono poi mediate per dare una stima complessiva delle prestazioni del modello.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Metriche/kfold.png}
+	\caption{Esempio di k-fold}
+	\label{fig:cross_validation}
+\end{figure} \noindent
+\`E stato dimostrato che il numero ottimale di fold è $k=10$ per ottenere delle stime accurate.
+La stratificazione \`e necessaria perch\'e riduce la varianza delle stime.
+Una modalit\`a ancora migliore prevede la ripetizione della k-fold cross validation pi\`u volte con suddivisioni diverse del dataset, per poi fare una media dei risultati.
+\subsection{Leave-one-out}
+La leave-one-out (LOO) è un caso particolare di k-fold cross validation in cui $k$ è uguale al numero totale di istanze nel dataset, dunque ogni fold contiene esattamente un'istanza di test.
+Questa strategia sfrutta meglio i dati a disposizione, non deve fare nessuna scelta casuale nella suddivisione del dataset, ma computazionalmente \`e molto costosa.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pictures/Metriche/leaveoneout.png}
+	\caption{Esempio di leave-one-out}
+	\label{fig:leave_one_out}
+\end{figure} \noindent
+\section{Affidabilit\`a delle misure di prestazioni}
+Possiamo valutare l'affidabilit\`a delle misure di prestazioni calcolando gli intervalli di confidenza.
+Supponiamo di aver avuto $S=750$ successi su $N=1000$ prove.
+Il valore stimato della probabilit\`a di successo \`e $\hat{p}=\frac{S}{N}=0.75$.
+Quanto \`e vicino il vero success rate $p$ a questa stima?
+Con un intervallo di confidenza al $80\%$ abbiamo $p \in [73.2, 76.7]$.
