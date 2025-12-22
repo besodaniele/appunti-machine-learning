@@ -1,4 +1,4 @@
-\documentclass[10pt,openany,onesided]{book}
+\documentclass[10pt,a4paper,openany]{book}
 \usepackage{array}
 \usepackage{booktabs}
 \usepackage[utf8]{inputenc}
@@ -36,15 +36,19 @@
 \date{Anno accademico 2025/2026}
 \begin{document}
 \frontmatter
-\maketitle	
+\begingroup
+\let\cleardoublepage\clearpage
+\maketitle
 \tableofcontents
-\newpage
-\mainmatter
 \chapter*{Premesse}
 Questi sono appunti realizzati per riassumere e schematizzare tutti i concetti presentati durante il corso di machine learning tenuto presso il corso di laurea magistrale in informatica presso l'università degli studi di Milano Bicocca.
 Lo scopo di questo documento non è quello di sostituire le lezioni del corso o di essere l'unica fonte di studio, bensì integrare le altri fonti con un documento riassuntivo.
 \\
 Mi scuso in anticipo per eventuali errori e prego i lettori di segnalarli contattandomi via mail all'indirizzo \href{mailto:d.besozzi@campus.unimib.it}{d.besozzi@campus.unimib.it}.
+
+\endgroup
+\newpage
+\mainmatter
 \subfile{sections/introduzione.tex}
 \subfile{sections/ConceptLearning.tex}
 \subfile{sections/FeatureEngineering.tex}
